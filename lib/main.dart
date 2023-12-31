@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'HomePage.dart';
 import 'pass_change.dart';
 
 void main() {
@@ -69,7 +70,7 @@ class _SignInPageState extends State<SignInPage> {
 
                           bool isValidNumber = RegExp(r'^\d{11}$').hasMatch(value);
                           if (!isValidNumber) {
-                            return 'Please enter 11 numbers';
+                            return 'Please enter your 11 digit sap id';
                           }
 
 
@@ -78,7 +79,7 @@ class _SignInPageState extends State<SignInPage> {
                         decoration: const InputDecoration(
                           labelText: 'SAP ID',
                           hintText: 'Enter your SAP ID',
-                          prefixIcon: Icon(Icons.email_outlined),
+                          prefixIcon: Icon(Icons.perm_identity_outlined),
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -142,7 +143,7 @@ class _SignInPageState extends State<SignInPage> {
                         );
                       },
                       child: const Text(
-                        "Don't have an account? Create account",
+                        "Forgot Password",
                         style: TextStyle(
                           color: Colors.blue,
                         ),
@@ -166,6 +167,13 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
+                            // Navigate to the Home Page
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
+                              ),
+                            );
                           }
                         },
                       ),
@@ -181,6 +189,9 @@ class _SignInPageState extends State<SignInPage> {
   }
 
   Widget _gap() => const SizedBox(height: 16);
-
-  pass_change() {}
 }
+
+
+pass_change() {}
+
+
