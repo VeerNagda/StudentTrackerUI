@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'PasswordChangePage.dart';
 import 'HomePage.dart';
+import 'AdminHomePage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +28,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
+  late String _enteredSapId; // Declare variable to store entered SAP ID
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -38,9 +40,7 @@ class _SignInPageState extends State<SignInPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            //background gradient #93a5cf → #e4efe9
             colors: [Color(0xFFe4efe9), Color(0xFF93a5cf)],
-           // colors: [Color(0xFFc4e0e5), Color(0xFF4ca1af)],
           ),
         ),
         child: Form(
@@ -51,38 +51,36 @@ class _SignInPageState extends State<SignInPage> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // replace image with an icon
                   Icon(
-                    Icons.person,
+                    Icons.admin_panel_settings,
                     size: 150,
-                    color: Colors.white, // Change to white
+                    color: Colors.white,
                   ),
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        "Welcome",
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Text(
+                      "Welcome",
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
-
+                  ),
                   _gap(),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       validator: (value) {
-                        // email validation part
                         if (value == null || value.isEmpty) {
                           return 'Please enter SAP ID';
                         }
 
-                        bool isValidNumber =
-                        RegExp(r'^\d{11}$').hasMatch(value);
-                        if (!isValidNumber) {
-                          return 'Please enter your 11 digit SAP ID';
+
+                        if (value.length != 8 && value.length != 11) {
+                          return 'Please enter your 8 or 11-digit SAP ID';
                         }
 
                         return null;
+                      },
+                      onChanged: (value) {
+                        _enteredSapId = value; // Update entered SAP ID
                       },
                       decoration: const InputDecoration(
                         labelText: 'SAP ID',
@@ -126,7 +124,6 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   _gap(),
-                  // remember me box
                   Row(
                     children: [
                       Checkbox(
@@ -144,7 +141,6 @@ class _SignInPageState extends State<SignInPage> {
                   _gap(),
                   GestureDetector(
                     onTap: () {
-                      // Going to "Forgot Password" page
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -161,26 +157,43 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   _gap(),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(7.0),
                     child: SizedBox(
                       width: double.infinity,
                       child: TextButton(
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
-                            // Navigate to the Home Page
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ),
-                            );
+                            // Check SAP ID length and navigate accordingly
+                            if (_enteredSapId.length == 11) {
+                              // Navigating to Admin Home Page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      HomePage(sapId: _enteredSapId),
+                                ),
+                              );
+                            } else if (_enteredSapId.length == 8) {
+                              // Navigating to Student Home Page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      AdminHomePage(sapId: _enteredSapId),
+                                ),
+                              );
+                            } else {
+                              // Handle error for invalid SAP ID length
+                              // You can show a Snackbar or AlertDialog here
+                              print('Invalid SAP ID length');
+                            }
                           }
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: Theme.of(context)
                               .colorScheme
                               .background
-                              .withOpacity(0.5), // 50% transparent
+                              .withOpacity(0.5),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -192,7 +205,7 @@ class _SignInPageState extends State<SignInPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white, // Change to white
+                              color: Colors.white,
                             ),
                           ),
                         ),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const HomePage(sapId: '',));
+  runApp(const AdminHomePage(sapId: '',));
 }
-class HomePage extends StatelessWidget {
+class AdminHomePage extends StatelessWidget {
   final String sapId;
 
-  const HomePage({Key? key, required this.sapId}) : super(key: key);
+  const AdminHomePage({Key? key, required this.sapId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Home'),
-              Tab(text: 'Attendance'),
+              Tab(text: 'Events'),
               Tab(text: 'History'),
             ],
           ),
@@ -27,7 +27,7 @@ class HomePage extends StatelessWidget {
         body: const TabBarView(
           children: [
             Center(child: Text('Home content')),
-            Center(child: Text('Attendance content')),
+            Center(child: Text('Events content')),
             Center(child: Text('History content')),
           ],
         ),

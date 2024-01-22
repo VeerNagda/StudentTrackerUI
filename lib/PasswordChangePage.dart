@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-
+import 'main.dart';
 import 'HomePage.dart';
 
 class PasswordChangePage extends StatelessWidget {
-  const PasswordChangePage({Key? key}) : super(key: key);
+  const PasswordChangePage({super.key});
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Change Password'),
+        title: const Text('Change Password'),
         backgroundColor: Colors.white, // Change to white
       ),
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -27,7 +27,7 @@ class PasswordChangePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                const Text(
                   'Change Password',
                   style: TextStyle(
                     fontSize: 24,
@@ -35,9 +35,9 @@ class PasswordChangePage extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'SAP ID (11 digits)',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.person_outline),
@@ -57,57 +57,55 @@ class PasswordChangePage extends StatelessWidget {
                     return null;
                   },
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Old Password',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
                   ),
                   obscureText: true,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'New Password',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
                   ),
                   obscureText: true,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Confirm New Password',
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
                   ),
                   obscureText: true,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
 
-                      // Navigate to the Home Page
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomePage(),
-                        ),
-                      );
-
+                      // Navigate to the Main Login Page which is MyApp
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MyApp(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.white, // Change to white
-                    onPrimary: Colors.black,
+                    foregroundColor: Colors.black, backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
 
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
+                  child: const Padding(
+                    padding: EdgeInsets.all(12.0),
                     child: Text(
                       'Change Password',
                       style: TextStyle(
