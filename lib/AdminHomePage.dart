@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:ui/EventsPage.dart';
+import 'package:ui/AdminHistory.dart';
 
 void main() {
-  runApp(const AdminHomePage(sapId: '',));
+  runApp(const AdminHomePage(sapId: ''));
 }
+
 class AdminHomePage extends StatelessWidget {
   final String sapId;
 
@@ -21,14 +24,13 @@ class AdminHomePage extends StatelessWidget {
               Tab(text: 'History'),
             ],
           ),
-          //have taken the sap id from the login page
           title: Text('$sapId'),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
             Center(child: Text('Home content')),
-            Center(child: Text('Events content')),
-            Center(child: Text('History content')),
+            EventsPage(),
+            AdminHistory(),
           ],
         ),
       ),
