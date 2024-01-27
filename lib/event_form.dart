@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ui/map.dart';
-import 'event.dart';
 import 'package:latlong2/latlong.dart';
-
+import 'map.dart';
+import 'event.dart';
 
 class EventFormResult {
   final Event? event;
@@ -11,18 +10,32 @@ class EventFormResult {
 }
 
 class EventForm extends StatefulWidget {
-  const EventForm({Key? key}) : super(key: key);
+  final Event? initialEvent; // Add initialEvent named parameter
+
+  const EventForm({Key? key, this.initialEvent}) : super(key: key);
 
   @override
   _EventFormState createState() => _EventFormState();
 }
 
 class _EventFormState extends State<EventForm> {
-  final TextEditingController eventNameController = TextEditingController();
-  final TextEditingController collegeNameController = TextEditingController();
+  late TextEditingController eventNameController;
+  late TextEditingController collegeNameController;
   DateTime? startDate;
   DateTime? endDate;
   List<LatLng> selectedVenues = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize controllers and other values based on the initialEvent
+    eventNameController = TextEditingController(text: widget.initialEvent?.eventName ?? '');
+    collegeNameController = TextEditingController(text: widget.initialEvent?.collegeName ?? '');
+    startDate = widget.initialEvent?.startDate;
+    endDate = widget.initialEvent?.endDate;
+    selectedVenues = widget.initialEvent?.venues ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,54 +47,95 @@ class _EventFormState extends State<EventForm> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextFormField(
-                controller: eventNameController,
-                decoration: const InputDecoration(labelText: 'Event Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the event name';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: collegeNameController,
-                decoration: const InputDecoration(labelText: 'College Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the college name';
-                  }
-                  return null;
-                },
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  List<LatLng> selectedVenuesResult = await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MapScreen()),
-                  );
-                  if (selectedVenuesResult != null) {
-                    setState(() {
-                      selectedVenues = selectedVenuesResult;
-                    });
-                  }
-                },
-                child: const Text('Select Venue'),
-              ),
-              Text('Selected Venues: ${selectedVenues.length}'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  _saveEvent();
-                },
-                child: const Text('Save Event'),
-              ),
+              _buildTextFormField('Event Name', eventNameController),
+              const SizedBox(height: 12),
+              _buildTextFormField('College Name', collegeNameController),
+              const SizedBox(height: 12),
+              _buildDateSelectionButton('Start Date', startDate),
+              const SizedBox(height: 12),
+              _buildDateSelectionButton('End Date', endDate),
+              const SizedBox(height: 12),
+              _buildVenueSelectionButton(),
+              const SizedBox(height: 12),
+              _buildSelectedVenuesText(),
+              const SizedBox(height: 24),
+              _buildSaveEventButton(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextFormField(String label, TextEditingController controller) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        // Removed border
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter the $label';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildDateSelectionButton(String label, DateTime? date) {
+    return ElevatedButton(
+      onPressed: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: date ?? DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(2101),
+        );
+
+        if (pickedDate != null) {
+          setState(() {
+            if (label == 'Start Date') {
+              startDate = pickedDate;
+            } else {
+              endDate = pickedDate;
+            }
+          });
+        }
+      },
+      child: Text('$label: ${date?.toLocal().toString() ?? "Pick a date"}'),
+    );
+  }
+
+  Widget _buildVenueSelectionButton() {
+    return ElevatedButton(
+      onPressed: () async {
+        List<LatLng> selectedVenuesResult = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MapScreen()),
+        );
+        if (selectedVenuesResult != null) {
+          setState(() {
+            selectedVenues = selectedVenuesResult;
+          });
+        }
+      },
+      child: const Text('Select Venue'),
+    );
+  }
+
+  Widget _buildSelectedVenuesText() {
+    return Text('Selected Venues: ${selectedVenues.length}');
+  }
+
+  Widget _buildSaveEventButton() {
+    return ElevatedButton(
+      onPressed: () {
+        _saveEvent();
+      },
+      child: const Text('Save Event'),
     );
   }
 

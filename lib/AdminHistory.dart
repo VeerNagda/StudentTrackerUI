@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AdminHistory extends StatefulWidget {
+  const AdminHistory({super.key});
+
   @override
   _EventDetailsState createState() => _EventDetailsState();
 }
@@ -13,11 +15,11 @@ class _EventDetailsState extends State<AdminHistory> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Event Details'),
+        title: const Text('Event Details'),
       ),
       body: Container(
-        padding: EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(16.0),
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -43,14 +45,14 @@ class _EventDetailsState extends State<AdminHistory> {
                 );
               }).toList(),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Add your logic for handling the selected event
                 // You can navigate to another page or perform any action
                 print('Selected Event: $selectedEvent');
               },
-              child: Text('Proceed'),
+              child: const Text('Proceed'),
             ),
           ],
         ),

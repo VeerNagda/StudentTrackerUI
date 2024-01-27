@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -34,14 +35,14 @@ class _MapScreenState extends State<MapScreen> {
     _mapController = MapController();
     _getUserLocation();
     networkUtility = NetworkUtility();
-    try{
-      if(Platform.isAndroid||Platform.isIOS) {
-        isWeb=false;
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        isWeb = false;
       } else {
-        isWeb=true;
+        isWeb = true;
       }
-    } catch(e){
-      isWeb=true;
+    } catch (e) {
+      isWeb = true;
     }
   }
 
@@ -51,19 +52,20 @@ class _MapScreenState extends State<MapScreen> {
       home: Scaffold(
         body: FlutterMap(
           options: MapOptions(
-              initialCenter: const LatLng(19.107579, 72.837509),
-              initialZoom: 17,
-              onLongPress: (position, latLong) {
-                _markers.add(Marker(
-                  point: latLong,
-                  child: const Icon(Icons.location_on),
-                ));
-                _polyPoints.add(latLong);
-                setState(() {
-                  _markers = _markers;
-                  _polyPoints = _polyPoints;
-                });
-              }),
+            center: LatLng(19.107579, 72.837509),
+            zoom: 17,
+            onLongPress: (position, latLong) {
+              _markers.add(Marker(
+                point: latLong,
+                child: const Icon(Icons.location_on),
+              ));
+              _polyPoints.add(latLong);
+              setState(() {
+                _markers = _markers;
+                _polyPoints = _polyPoints;
+              });
+            },
+          ),
           mapController: _mapController,
           children: [
             TileLayer(
@@ -88,36 +90,42 @@ class _MapScreenState extends State<MapScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                        onPressed: saveVenue(), child: const Icon(Icons.save_alt)),
+                      onPressed: saveVenue,
+                      child: const Icon(Icons.save_alt),
+                    ),
                     ElevatedButton(
-                        onPressed: _getUserLocation,
-                        child: const Icon(Icons.navigation)),
+                      onPressed: _getUserLocation,
+                      child: const Icon(Icons.navigation),
+                    ),
                   ],
                 ),
               ),
             ),
             CurrentLocationLayer(
-                positionStream: const LocationMarkerDataStreamFactory()
-                    .fromGeolocatorPositionStream(
-                        stream: Geolocator.getPositionStream(
-                            locationSettings: const LocationSettings(
-              accuracy: LocationAccuracy.high,
-              distanceFilter: 50,
-              timeLimit: Duration(seconds: 30),
-            )))),
+              positionStream: const LocationMarkerDataStreamFactory()
+                  .fromGeolocatorPositionStream(
+                stream: Geolocator.getPositionStream(
+                  locationSettings: const LocationSettings(
+                    accuracy: LocationAccuracy.high,
+                    distanceFilter: 50,
+                    timeLimit: Duration(seconds: 30),
+                  ),
+                ),
+              ),
+            ),
             MarkerLayer(
               markers: _markers,
             ),
-            PolygonLayer(polygons: [
-              Polygon(
-                points: _polyPoints,
-                color: Colors.blueGrey.shade200.withOpacity(0.5),
-                isFilled: true,
-                isDotted: true,
-              ),
-            ]),
-            //mapSearch(),
-        
+            PolygonLayer(
+              polygons: [
+                Polygon(
+                  points: _polyPoints,
+                  color: Colors.blueGrey.shade200.withOpacity(0.5),
+                  isFilled: true,
+                  isDotted: true,
+                ),
+              ],
+            ),
             Card(
               elevation: 20,
               shape: RoundedRectangleBorder(
@@ -138,7 +146,7 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -168,7 +176,6 @@ class _MapScreenState extends State<MapScreen> {
           double longitude = double.parse(prediction.lng ?? '0.0');
           _mapController.move(LatLng(latitude, longitude), 17);
         },
-
         itemClick: (Prediction prediction) {
           controller.text = prediction.description ?? "";
           controller.selection = TextSelection.fromPosition(
@@ -203,11 +210,12 @@ class _MapScreenState extends State<MapScreen> {
   void _getUserLocation() async {
     try {
       var position = await GeolocatorPlatform.instance.getCurrentPosition(
-          locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.best,
-        distanceFilter: 50,
-        timeLimit: Duration(seconds: 20),
-      ));
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.best,
+          distanceFilter: 50,
+          timeLimit: Duration(seconds: 20),
+        ),
+      );
       _mapController.move(LatLng(position.latitude, position.longitude), 17);
     } catch (e) {
       if (e is TimeoutException) {
@@ -229,7 +237,7 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> placeAutoComplete(String query) async {
     Uri uri =
-        Uri.https("maps.googleapis.com", "maps/api/place/autocomplete/json", {
+    Uri.https("maps.googleapis.com", "maps/api/place/autocomplete/json", {
       "input": query,
       "key": apiKey,
     });

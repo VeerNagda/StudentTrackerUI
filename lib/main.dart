@@ -8,18 +8,18 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: SignInPage(),
     );
   }
 }
 
 class SignInPage extends StatefulWidget {
-  const SignInPage({Key? key}) : super(key: key);
+  const SignInPage({super.key});
 
   @override
   State<SignInPage> createState() => _SignInPageState();
@@ -36,7 +36,7 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -51,7 +51,7 @@ class _SignInPageState extends State<SignInPage> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.admin_panel_settings,
                     size: 150,
                     color: Colors.white,
@@ -135,7 +135,7 @@ class _SignInPageState extends State<SignInPage> {
                           });
                         },
                       ),
-                      Text('Remember me'),
+                      const Text('Remember me'),
                     ],
                   ),
                   _gap(),
@@ -144,7 +144,7 @@ class _SignInPageState extends State<SignInPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => PasswordChangePage(),
+                          builder: (context) => const PasswordChangePage(),
                         ),
                       );
                     },
@@ -198,8 +198,8 @@ class _SignInPageState extends State<SignInPage> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
                           child: Text(
                             'Sign in',
                             style: TextStyle(

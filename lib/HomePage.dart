@@ -6,7 +6,7 @@ void main() {
 class HomePage extends StatelessWidget {
   final String sapId;
 
-  const HomePage({Key? key, required this.sapId}) : super(key: key);
+  const HomePage({super.key, required this.sapId});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
           //have taken the sap id from the login page
-          title: Text('$sapId'),
+          title: Text(sapId),
         ),
         body: const TabBarView(
           children: [
