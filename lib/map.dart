@@ -52,7 +52,7 @@ class _MapScreenState extends State<MapScreen> {
       home: Scaffold(
         body: FlutterMap(
           options: MapOptions(
-            center: LatLng(19.107579, 72.837509),
+            center: const LatLng(19.107579, 72.837509),
             zoom: 17,
             onLongPress: (position, latLong) {
               _markers.add(Marker(

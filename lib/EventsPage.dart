@@ -3,7 +3,7 @@ import 'event.dart';
 import 'event_form.dart';
 
 class EventsPage extends StatefulWidget {
-  const EventsPage({Key? key}) : super(key: key);
+  const EventsPage({super.key});
 
   @override
   _EventsPageState createState() => _EventsPageState();
@@ -23,7 +23,7 @@ class _EventsPageState extends State<EventsPage> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: events.isEmpty
-            ? Center(
+            ? const Center(
           child: Text(
             'No events yet. '
                 'Tap the + button to add an event.',
@@ -80,7 +80,7 @@ class _EventsPageState extends State<EventsPage> {
       MaterialPageRoute(builder: (context) => const EventForm()),
     );
 
-    if (result != null && result.event != null) {
+    if (result.event != null) {
       setState(() {
         events.add(result.event!);
       });
@@ -95,7 +95,7 @@ class _EventsPageState extends State<EventsPage> {
       ),
     );
 
-    if (result != null && result.event != null) {
+    if (result.event != null) {
       setState(() {
         events.remove(event);
         events.add(result.event!);

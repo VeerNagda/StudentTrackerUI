@@ -12,7 +12,7 @@ class EventFormResult {
 class EventForm extends StatefulWidget {
   final Event? initialEvent; // Add initialEvent named parameter
 
-  const EventForm({Key? key, this.initialEvent}) : super(key: key);
+  const EventForm({super.key, this.initialEvent});
 
   @override
   _EventFormState createState() => _EventFormState();
@@ -29,7 +29,7 @@ class _EventFormState extends State<EventForm> {
   void initState() {
     super.initState();
 
-    // Initialize controllers and other values based on the initialEvent
+    // have Initialized controllers and other values based on the initialEvent
     eventNameController = TextEditingController(text: widget.initialEvent?.eventName ?? '');
     collegeNameController = TextEditingController(text: widget.initialEvent?.collegeName ?? '');
     startDate = widget.initialEvent?.startDate;
@@ -105,7 +105,7 @@ class _EventFormState extends State<EventForm> {
           });
         }
       },
-      child: Text('$label: ${date?.toLocal().toString() ?? "Pick a date"}'),
+      child: Text('$label: ${date?.toLocal().toString() ?? ""}'),
     );
   }
 
@@ -116,12 +116,10 @@ class _EventFormState extends State<EventForm> {
           context,
           MaterialPageRoute(builder: (context) => const MapScreen()),
         );
-        if (selectedVenuesResult != null) {
-          setState(() {
-            selectedVenues = selectedVenuesResult;
-          });
-        }
-      },
+        setState(() {
+          selectedVenues = selectedVenuesResult;
+        });
+            },
       child: const Text('Select Venue'),
     );
   }
@@ -140,13 +138,12 @@ class _EventFormState extends State<EventForm> {
   }
 
   void _saveEvent() {
-    // Validate form fields before saving
+    //validation
     if (eventNameController.text.isEmpty || collegeNameController.text.isEmpty) {
-      // Show an error message or handle validation as needed
+
       return;
     }
 
-    // Create an Event object with the form data
     Event newEvent = Event(
       eventName: eventNameController.text,
       collegeName: collegeNameController.text,
