@@ -6,7 +6,7 @@ import 'CameraPage.dart';
 class AttendancePage extends StatefulWidget {
   final List<CameraDescription> cameras;
 
-  const AttendancePage({Key? key, required this.cameras}) : super(key: key);
+  const AttendancePage({super.key, required this.cameras});
 
   @override
   _AttendancePageState createState() => _AttendancePageState();
@@ -24,7 +24,7 @@ class _AttendancePageState extends State<AttendancePage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Attendance'),
+        title: const Text('Attendance'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -54,7 +54,7 @@ class _AttendancePageState extends State<AttendancePage> {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
       ),
       value: selectedValue,
       items: items.map((item) => DropdownMenuItem<String>(value: item, child: Text(item))).toList(),

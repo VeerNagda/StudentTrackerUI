@@ -4,7 +4,7 @@ import 'package:camera/camera.dart';
 class CameraPage extends StatefulWidget {
   final CameraDescription camera;
 
-  const CameraPage({Key? key, required this.camera}) : super(key: key);
+  const CameraPage({super.key, required this.camera});
 
   @override
   _CameraPageState createState() => _CameraPageState();
@@ -35,7 +35,7 @@ class _CameraPageState extends State<CameraPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Click Photo'),
+        title: const Text('Click Photo'),
       ),
       body: FutureBuilder(
         future: _initializeControllerFuture,
@@ -43,7 +43,7 @@ class _CameraPageState extends State<CameraPage> {
           if (snapshot.connectionState == ConnectionState.done) {
             return CameraPreview(_controller);
           } else {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),
@@ -57,7 +57,7 @@ class _CameraPageState extends State<CameraPage> {
             print('Error taking picture: $e');
           }
         },
-        child: Icon(Icons.camera),
+        child: const Icon(Icons.camera),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );

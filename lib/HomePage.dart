@@ -3,7 +3,7 @@ import 'AttendancePage.dart';
 
 void main() {
   runApp(
-    MaterialApp(
+    const MaterialApp(
       home: HomePage(sapId: ''),
     ),
   );
@@ -12,7 +12,7 @@ void main() {
 class HomePage extends StatelessWidget {
   final String sapId;
 
-  HomePage({Key? key, required this.sapId}) : super(key: key);
+  const HomePage({super.key, required this.sapId});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class HomePage extends StatelessWidget {
               className: 'BSC IT',
               rollNumber: 'A000',
             ),
-            AttendancePage(cameras: [],),
+            const AttendancePage(cameras: [],),
           ],
         ),
       ),
@@ -60,7 +60,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         //this will by default remove the arrow we get
         automaticallyImplyLeading: false,
-        title: Text('User Details'),
+        title: const Text('User Details'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -86,17 +86,17 @@ class HomePage extends StatelessWidget {
         children: [
           Text(
             '$label:',
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               //have put placeholder for now.
               value.isNotEmpty ? value : 'Placeholder',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
               ),
             ),
