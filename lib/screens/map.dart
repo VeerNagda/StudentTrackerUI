@@ -7,8 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:ui/Constants.dart';
-import 'package:ui/network_utility.dart';
+import '../utils/Constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
@@ -26,7 +25,6 @@ class _MapScreenState extends State<MapScreen> {
   late List<Marker> _markers = [];
   late List<LatLng> _polyPoints = [];
   TextEditingController controller = TextEditingController();
-  late NetworkUtility networkUtility;
   late bool isWeb;
 
   @override
@@ -34,7 +32,6 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _mapController = MapController();
     _getUserLocation();
-    networkUtility = NetworkUtility();
     try {
       if (Platform.isAndroid || Platform.isIOS) {
         isWeb = false;
@@ -77,8 +74,8 @@ class _MapScreenState extends State<MapScreen> {
               attributions: [
                 TextSourceAttribution(
                   'OpenStreetMap contributors',
-                  onTap: () =>
-                      launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+                  onTap: () => launchUrl(
+                      Uri.parse('https://openstreetmap.org/copyright')),
                 ),
               ],
             ),
@@ -134,7 +131,8 @@ class _MapScreenState extends State<MapScreen> {
               ),
               clipBehavior: Clip.antiAlias,
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 300, maxHeight: 49.4),
+                constraints:
+                    const BoxConstraints(maxWidth: 300, maxHeight: 49.4),
                 child: Scaffold(
                   body: SizedBox(
                     child: Column(
@@ -237,11 +235,12 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> placeAutoComplete(String query) async {
     Uri uri =
-    Uri.https("maps.googleapis.com", "maps/api/place/autocomplete/json", {
+        Uri.https("maps.googleapis.com", "maps/api/place/autocomplete/json", {
       "input": query,
       "key": apiKey,
     });
-    String? respose = await networkUtility.fetchUrl(uri);
+    //TODO
+    const int respose = 100;
     if (respose != null) {
       if (kDebugMode) {
         print(respose);

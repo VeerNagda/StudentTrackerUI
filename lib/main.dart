@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'PasswordChangePage.dart';
-import 'HomePage.dart';
-import 'AdminHomePage.dart';
+import 'screens/AdminHomePage.dart';
+import 'screens/PasswordChangePage.dart';
+import 'screens/HomePage.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -71,12 +73,9 @@ class _SignInPageState extends State<SignInPage> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter SAP ID';
                         }
-
-
                         if (value.length != 8 && value.length != 11) {
                           return 'Please enter your 8 or 11-digit SAP ID';
                         }
-
                         return null;
                       },
                       onChanged: (value) {
@@ -164,6 +163,9 @@ class _SignInPageState extends State<SignInPage> {
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
                             // Check SAP ID length and navigate accordingly
+
+                            //TODO
+
                             if (_enteredSapId.length == 11) {
                               // Navigating to Admin Home Page
                               Navigator.push(
@@ -185,7 +187,9 @@ class _SignInPageState extends State<SignInPage> {
                             } else {
                               // Handle error for invalid SAP ID length
                               // You can show a Snackbar or AlertDialog here
-                              print('Invalid SAP ID length');
+                              if (kDebugMode) {
+                                print('Invalid SAP ID length');
+                              }
                             }
                           }
                         },

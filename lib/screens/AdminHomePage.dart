@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ui/EventsPage.dart';
-import 'package:ui/AdminHistory.dart';
+import 'AdminHistory.dart';
+
+import 'EventsPage.dart';
 
 void main() {
   runApp(const AdminHomePage(sapId: ''));
