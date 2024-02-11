@@ -4,13 +4,12 @@ import 'AdminHistory.dart';
 import 'EventsPage.dart';
 
 void main() {
-  runApp(const AdminHomePage(sapId: ''));
+  runApp(const AdminHomePage());
 }
 
 class AdminHomePage extends StatelessWidget {
-  final String sapId;
 
-  const AdminHomePage({super.key, required this.sapId});
+  const AdminHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +30,7 @@ class AdminHomePage extends StatelessWidget {
               Tab(text: 'History'),
             ],
           ),
-          title: Text(sapId),
+          title: const Text("sapId"),
         ),
         body: const TabBarView(
           children: [

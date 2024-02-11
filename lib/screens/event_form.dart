@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:ui/models/event/event_response_model.dart';
 import 'map.dart';
-import 'event.dart';
 
 class EventFormResult {
-  final Event? event;
+  final EventResponseModel? event;
 
   EventFormResult({this.event});
 }
 
 class EventForm extends StatefulWidget {
-  final Event? initialEvent; // Add initialEvent named parameter
+  final EventResponseModel? initialEvent; // Add initialEvent named parameter
 
   const EventForm({super.key, this.initialEvent});
 
@@ -19,22 +18,22 @@ class EventForm extends StatefulWidget {
 }
 
 class _EventFormState extends State<EventForm> {
+  late TextEditingController eventIdController;
   late TextEditingController eventNameController;
-  late TextEditingController collegeNameController;
   DateTime? startDate;
   DateTime? endDate;
-  List<LatLng> selectedVenues = [];
+  List<Venue> selectedVenues = [];
 
   @override
   void initState() {
     super.initState();
 
     // have Initialized controllers and other values based on the initialEvent
+    eventIdController = TextEditingController(text: widget.initialEvent?.eventID ?? '');
     eventNameController = TextEditingController(text: widget.initialEvent?.eventName ?? '');
-    collegeNameController = TextEditingController(text: widget.initialEvent?.collegeName ?? '');
     startDate = widget.initialEvent?.startDate;
     endDate = widget.initialEvent?.endDate;
-    selectedVenues = widget.initialEvent?.venues ?? [];
+    selectedVenues = widget.initialEvent?.venue ?? [];
   }
 
   @override
@@ -49,9 +48,9 @@ class _EventFormState extends State<EventForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildTextFormField('Event Name', eventNameController),
+              _buildTextFormField('Event Name', eventIdController),
               const SizedBox(height: 12),
-              _buildTextFormField('College Name', collegeNameController),
+              _buildTextFormField('College Name', eventNameController),
               const SizedBox(height: 12),
               _buildDateSelectionButton('Start Date', startDate),
               const SizedBox(height: 12),
@@ -98,7 +97,7 @@ class _EventFormState extends State<EventForm> {
         if (pickedDate != null) {
           setState(() {
             if (label == 'Start Date') {
-              startDate = pickedDate;
+              startDate = pickedDate; // TODO parinaz Get time to
             } else {
               endDate = pickedDate;
             }
@@ -112,7 +111,7 @@ class _EventFormState extends State<EventForm> {
   Widget _buildVenueSelectionButton() {
     return ElevatedButton(
       onPressed: () async {
-        List<LatLng> selectedVenuesResult = await Navigator.push(
+        List<Venue> selectedVenuesResult = await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const MapScreen()),
         );
@@ -139,17 +138,17 @@ class _EventFormState extends State<EventForm> {
 
   void _saveEvent() {
     //validation
-    if (eventNameController.text.isEmpty || collegeNameController.text.isEmpty) {
+    if (eventIdController.text.isEmpty || eventNameController.text.isEmpty) {
 
       return;
     }
 
-    Event newEvent = Event(
+    EventResponseModel newEvent = EventResponseModel(
+      eventID: eventIdController.text,
       eventName: eventNameController.text,
-      collegeName: collegeNameController.text,
       startDate: startDate,
       endDate: endDate,
-      venues: selectedVenues,
+      venue: [],
     );
 
     // Return the Event object to the previous screen

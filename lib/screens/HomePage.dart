@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 import 'AttendancePage.dart';
 
-void main() {
-  runApp(
-    const MaterialApp(
-      home: HomePage(sapId: ''),
-    ),
-  );
-}
-
 class HomePage extends StatelessWidget {
-  final String sapId;
 
-  const HomePage({super.key, required this.sapId});
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +21,7 @@ class HomePage extends StatelessWidget {
               Tab(text: 'Attendance'),
             ],
           ),
-          title: Text(sapId),
+          title: const Text("sapId"),
         ),
         body: TabBarView(
           children: [

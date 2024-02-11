@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'event.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ui/models/event/event_response_model.dart';
+import 'package:ui/services/api_service.dart';
 import 'event_form.dart';
 
 class EventsPage extends StatefulWidget {
@@ -10,7 +14,27 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  List<Event> events = [];
+  //late List<Event> events= [];
+  late List<EventResponseModel> events = [];
+  late List<dynamic> jsonList;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    APIService.doGet(path: "/admin/get-upcoming-events").then((value) => {
+          if (value != "")
+            {
+              setState(() {
+                events = jsonDecode(value)
+                    .map<EventResponseModel>(
+                        (item) => EventResponseModel.fromJson(item))
+                    .toList();
+              }),
+              print(events)
+            }
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,45 +48,46 @@ class _EventsPageState extends State<EventsPage> {
         padding: const EdgeInsets.all(8.0),
         child: events.isEmpty
             ? const Center(
-          child: Text(
-            'No events yet. '
-                'Tap the + button to add an event.',
-            style: TextStyle(fontSize: 16.0),
-          ),
-        )
-            : ListView.builder(
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 5,
-              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: ListTile(
-                title: Text(events[index].eventName),
-                subtitle: Text('Venues: ${events[index].venues.length}'),
-                onTap: () {
-                  _navigateToEventDetails(events[index]);
-                },
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        _navigateToEventFormForEditing(events[index]);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(events[index]);
-                      },
-                    ),
-                  ],
+                child: Text(
+                  'No events yet. '
+                  'Tap the + button to add an event.',
+                  style: TextStyle(fontSize: 16.0),
                 ),
+              )
+            : ListView.builder(
+                itemCount: events.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 5,
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListTile(
+                      title: Text(events[index].eventName),
+                      subtitle: Text('Venues: ${events[index].venue?.length}'),
+                      onTap: () {
+                        _navigateToEventDetails(events[index]);
+                      },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              _navigateToEventFormForEditing(events[index]);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              _showDeleteConfirmationDialog(events[index]);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -87,7 +112,7 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
-  _navigateToEventFormForEditing(Event event) async {
+  _navigateToEventFormForEditing(EventResponseModel event) async {
     EventFormResult result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -103,7 +128,7 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
-  _showDeleteConfirmationDialog(Event event) {
+  _showDeleteConfirmationDialog(EventResponseModel event) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -113,14 +138,14 @@ class _EventsPageState extends State<EventsPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.pop;
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 _deleteEvent(event);
-                Navigator.pop(context);
+                context.pop();
               },
               child: const Text('Delete'),
             ),
@@ -130,15 +155,23 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  _deleteEvent(Event event) {
-    setState(() {
-      events.remove(event);
-    });
+  _deleteEvent(EventResponseModel event) {
+    Map<String, String>query = {
+      "eventId": event.eventID
+    };
+    APIService.doDelete(path: "/admin/delete-event", query: query).then((value) => {
+          if (value == "Success")
+            {
+              setState(() {
+                events.remove(event);
+              })
+            }
+        });
   }
 
-  _navigateToEventDetails(Event selectedEvent) {
+  _navigateToEventDetails(EventResponseModel selectedEvent) {
     print('Selected Event Details:');
+    print('Event ID: ${selectedEvent.eventID}');
     print('Event Name: ${selectedEvent.eventName}');
-    print('College Name: ${selectedEvent.collegeName}');
   }
 }

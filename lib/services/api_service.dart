@@ -1,0 +1,106 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:ui/models/login/login_request_model.dart';
+import 'package:ui/models/login/login_response_model.dart';
+import 'package:ui/models/messageModel.dart';
+import 'package:ui/services/shared_service.dart';
+import 'package:ui/utils/constants.dart';
+
+import '../widgets/response_toast.dart';
+
+class APIService {
+  static var client = http.Client();
+
+  static Future<int?> login(
+      BuildContext context, LoginRequestModel model) async {
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+    };
+
+    var url = Uri.http(Constants.baseUri, "/api/login");
+    //TODO add try catch
+    var response = await client.post(url,
+        headers: requestHeaders, body: jsonEncode(model.toJson()));
+    if (response.statusCode == 200) {
+      SharedService.setLoginDetails(loginResponseJson(response.body));
+      var role = SharedService.role;
+      return role;
+    } else if (response.statusCode == 401) {
+      MessageModel messageModel = messageResponseJson(response.body);
+      toast(status: response.statusCode, message: messageModel.message);
+    }
+    return null;
+  }
+
+  static Future<int> doPostInsert(
+      {required BuildContext context,
+      required Map<String, dynamic> data,
+      required String path}) async {
+    LoginResponseModel? loginData = await SharedService.getLoginDetails();
+
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${loginData!.accessToken}',
+    };
+    var url = Uri.http(Constants.baseUri, "/api$path");
+    try {
+      var response =
+          await client.post(url, headers: requestHeaders, body: jsonEncode(data)  );
+      MessageModel messageModel = messageResponseJson(response.body);
+      toast(status: response.statusCode, message: messageModel.message);
+      return response.statusCode;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return -1;
+    }
+  }
+
+  static Future<String> doGet({required String path, Map<String, String>? query})async {
+    LoginResponseModel? loginData = await SharedService.getLoginDetails();
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${loginData!.accessToken}',
+    };
+    Uri url;
+    if(query == null) {
+       url = Uri.http(Constants.baseUri, "/api$path", query);
+    }else {
+      url = Uri.http(Constants.baseUri, "/api$path", query);
+    }
+    var response = await client.get(url, headers: requestHeaders);
+    if(response.statusCode == 200){
+      return response.body;
+    }
+    return "";
+  }
+
+  static Future<String> doDelete({required String path, Map<String, String>? query}) async {
+    LoginResponseModel? loginData = await SharedService.getLoginDetails();
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${loginData!.accessToken}',
+    };
+
+    Uri url;
+    if (query == null) {
+      url = Uri.http(Constants.baseUri, "/api$path");
+    } else {
+      url = Uri.http(Constants.baseUri, "/api$path", query);
+    }
+
+    var response = await http.delete(url, headers: requestHeaders);
+
+    if (response.statusCode == 204) { // Assuming 204 is returned for successful delete
+      return "Success"; // You can return any appropriate message or indicator
+    } else {
+      return "Failed"; // You can return any appropriate message or indicator
+    }
+  }
+
+
+}

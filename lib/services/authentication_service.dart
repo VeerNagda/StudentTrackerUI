@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../utils/Constants.dart';
+import '../utils/constants.dart';
 
 class AuthenticationService {
-  String baseUrl = baseUri; // Replace with your API base URL
+  String baseUrl = Constants.baseUri; // Replace with your API base URL
 
   Future<String?> authenticateUser(String uID, String pass) async {
     try {
