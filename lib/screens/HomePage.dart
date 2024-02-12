@@ -17,8 +17,9 @@ class HomePage extends StatelessWidget {
           ),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'User Details'),
               Tab(text: 'Attendance'),
+              Tab(text: 'User Profile'),
+
             ],
           ),
           title: const Text("sapId"),

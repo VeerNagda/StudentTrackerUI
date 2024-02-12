@@ -1,7 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-import 'CameraPage.dart';
+import 'TakePictureScreen.dart';
 
 class AttendancePage extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -67,7 +67,7 @@ class _AttendancePageState extends State<AttendancePage> {
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CameraPage(camera: widget.cameras.first)),
+          MaterialPageRoute(builder: (context) => TakePictureScreen(camera: widget.cameras.first)),
         );
       },
       child: const Text('Click Photo'),

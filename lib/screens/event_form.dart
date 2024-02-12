@@ -48,9 +48,9 @@ class _EventFormState extends State<EventForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildTextFormField('Event Name', eventIdController),
+              _buildTextFormField('Event ID', eventIdController),
               const SizedBox(height: 12),
-              _buildTextFormField('College Name', eventNameController),
+              _buildTextFormField('Event Name', eventNameController),
               const SizedBox(height: 12),
               _buildDateSelectionButton('Start Date', startDate),
               const SizedBox(height: 12),
@@ -94,16 +94,14 @@ class _EventFormState extends State<EventForm> {
           lastDate: DateTime(2101),
         );
 
-        if (pickedDate != null) {
-          setState(() {
-            if (label == 'Start Date') {
-              startDate = pickedDate; // TODO parinaz Get time to
-            } else {
-              endDate = pickedDate;
-            }
-          });
-        }
-      },
+        setState(() {
+          if (label == 'Start Date') {
+            startDate = pickedDate; // TODO parinaz Get time to
+          } else {
+            endDate = pickedDate;
+          }
+        });
+            },
       child: Text('$label: ${date?.toLocal().toString() ?? ""}'),
     );
   }

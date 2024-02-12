@@ -267,7 +267,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  placesAutoCompleteTextField() {
+  /* placesAutoCompleteTextField() {
     return Container(
       alignment: Alignment.topLeft,
       child: GooglePlaceAutoCompleteTextField(
@@ -317,6 +317,62 @@ class _MapScreenState extends State<MapScreen> {
         ),
 
         // default 600 ms ,
+      ),
+    );
+  }
+*/
+  placesAutoCompleteTextField() {
+    return Center( // Aligns the widget in the center
+      child: Container(
+        alignment: Alignment.topLeft,
+        child: GooglePlaceAutoCompleteTextField(
+          textEditingController: controller,
+          googleAPIKey: Constants.apiKey,
+          inputDecoration: const InputDecoration(
+            hintText: "Search your location",
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+          ),
+          debounceTime: 400,
+          countries: const ["in", "fr"],
+          isLatLngRequired: true,
+          getPlaceDetailWithLatLng: (Prediction prediction) {
+            if (kDebugMode) {
+              print(prediction.lng);
+            }
+
+            double latitude = double.parse(prediction.lat ?? '0.0');
+            double longitude = double.parse(prediction.lng ?? '0.0');
+            _mapController.move(LatLng(latitude, longitude), 17);
+          },
+          itemClick: (Prediction prediction) {
+            controller.text = prediction.description ?? "";
+            controller.selection = TextSelection.fromPosition(
+                TextPosition(offset: prediction.description?.length ?? 0));
+          },
+          seperatedBuilder: const Divider(),
+          containerHorizontalPadding: 10,
+
+          // OPTIONAL// If you want to customize list view item builder
+          itemBuilder: (context, index, Prediction prediction) {
+            return Row(
+              children: [
+                const Icon(Icons.location_on),
+                const SizedBox(
+                  width: 7,
+                ),
+                Expanded(child: Text(prediction.description ?? ""))
+              ],
+            );
+          },
+
+          isCrossBtnShown: true,
+          boxDecoration: const BoxDecoration(
+            color: Colors.transparent,
+          ),
+
+          // default 600 ms ,
+        ),
       ),
     );
   }

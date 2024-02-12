@@ -1,42 +1,51 @@
 import 'package:flutter/material.dart';
-import 'AdminHistory.dart';
-
-import 'EventsPage.dart';
+import 'package:ui/screens/AddVenuePage.dart';
+import 'package:ui/screens/EventsPage.dart';
+import 'package:ui/screens/login_page.dart';
 
 void main() {
   runApp(const AdminHomePage());
 }
 
 class AdminHomePage extends StatelessWidget {
-
-  const AdminHomePage({super.key});
+  const AdminHomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    //have use tab instead of side nav bar
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          // icon next to sap id
           leading: IconButton(
-            icon: const Icon(Icons.person), onPressed: () {  }, // Use the person icon for profile
-
+            icon: const Icon(Icons.person),
+            onPressed: () {}, // Handle profile button tap
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () {
+                // have not used go router yet
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+              },
+            ),
+          ],
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Home'),
               Tab(text: 'Events'),
-              Tab(text: 'History'),
+              Tab(text: 'Venue'),
+              Tab(text: 'Student Group'),
             ],
           ),
           title: const Text("sapId"),
         ),
         body: const TabBarView(
           children: [
-            Center(child: Text('Home content')),
             EventsPage(),
-            AdminHistory(),
+            AddVenuePage(),
+            AddVenuePage(),
           ],
         ),
       ),
