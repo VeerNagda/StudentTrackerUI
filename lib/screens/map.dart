@@ -199,7 +199,7 @@ class _MapScreenState extends State<MapScreen> {
                     children: [
                       ElevatedButton(
                           onPressed: () async {
-                            //TODO check if atleast 3 points added
+                            //TODO pari check if atleast 3 points added
                             _polyPoints.add(_polyPoints[0]);
                             _venueRequestModel.coordinates = _polyPoints;
                             await showDataAlert(context);
@@ -247,7 +247,7 @@ class _MapScreenState extends State<MapScreen> {
                 clipBehavior: Clip.antiAlias,
                 child: ConstrainedBox(
                   constraints:
-                      const BoxConstraints(maxWidth: 300, maxHeight: 49.4),
+                      const BoxConstraints(maxWidth: 450, maxHeight: 49.4), // Align
                   child: Scaffold(
                     body: SizedBox(
                       child: Column(

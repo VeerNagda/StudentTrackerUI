@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../services/shared_service.dart';
 import 'AttendancePage.dart';
 
 class HomePage extends StatelessWidget {
@@ -8,17 +10,31 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {},
           ),
+
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () {
+
+                SharedService.prefs.remove("accessToken");
+                SharedService.prefs.remove("role");
+                SharedService.isAuth = false;
+                context.goNamed("login");
+              },
+            ),
+          ],
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Attendance'),
+
               Tab(text: 'User Profile'),
+              Tab(text: 'Attendance'),
 
             ],
           ),
@@ -34,7 +50,7 @@ class HomePage extends StatelessWidget {
               className: 'BSC IT',
               rollNumber: 'A000',
             ),
-            const AttendancePage(cameras: [],),
+            const AttendancePage(),
           ],
         ),
       ),
