@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ui/screens/AddVenuePage.dart';
-import 'package:ui/screens/EventsPage.dart';
 import 'package:ui/screens/login_page.dart';
+
+import 'EventsPage.dart';
 
 void main() {
   runApp(const AdminHomePage());

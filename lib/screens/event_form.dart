@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ui/models/event/event_response_model.dart';
+import 'package:ui/screens/EventsPage.dart';
 import 'map.dart';
 
 class EventFormResult {
