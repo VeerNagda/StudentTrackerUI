@@ -13,18 +13,19 @@ class AdminHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () {}, // Handle profile button tap
+            onPressed: () {},
           ),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
                 // have not used go router yet
+                // TO DO VEER
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
@@ -37,6 +38,7 @@ class AdminHomePage extends StatelessWidget {
               Tab(text: 'Events'),
               Tab(text: 'Venue'),
               Tab(text: 'Student Group'),
+              Tab(text: 'Attendance'),
             ],
           ),
           title: const Text("sapId"),
@@ -45,7 +47,8 @@ class AdminHomePage extends StatelessWidget {
           children: [
             EventsPage(),
             AddVenuePage(),
-            AddVenuePage(),
+            AddVenuePage(), //not created student group page yet
+            AddVenuePage(), // not created attendance page yet
           ],
         ),
       ),
