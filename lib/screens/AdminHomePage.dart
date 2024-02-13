@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ui/screens/AddVenuePage.dart';
 import 'package:ui/screens/login_page.dart';
-import 'package:ui/services/shared_service.dart';
 
 import 'EventsPage.dart';
 
@@ -27,11 +25,12 @@ class AdminHomePage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-
-                SharedService.prefs.remove("accessToken");
-                SharedService.prefs.remove("role");
-                SharedService.isAuth = false;
-                context.goNamed("login");
+                // have not used go router yet
+                // TO DO VEER
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
               },
             ),
           ],

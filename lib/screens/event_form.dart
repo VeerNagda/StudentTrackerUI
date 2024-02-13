@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ui/models/event/event_response_model.dart';
-import 'package:ui/screens/EventsPage.dart';
-import 'map.dart';
+import 'VenueSelectionScreen.dart';
 
 class EventFormResult {
   final EventResponseModel? event;
@@ -107,20 +106,7 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-  Widget _buildVenueSelectionButton() {
-    return ElevatedButton(
-      onPressed: () async {
-        List<Venue> selectedVenuesResult = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MapScreen()),
-        );
-        setState(() {
-          selectedVenues = selectedVenuesResult;
-        });
-            },
-      child: const Text('Select Venue'),
-    );
-  }
+
 
   Widget _buildSelectedVenuesText() {
     return Text('Selected Venues: ${selectedVenues.length}');
@@ -134,6 +120,22 @@ class _EventFormState extends State<EventForm> {
       child: const Text('Save Event'),
     );
   }
+
+  Widget _buildVenueSelectionButton() {
+    return ElevatedButton(
+      onPressed: () async {
+        List<Venue> selectedVenuesResult = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => VenueSelectionScreen()),
+        );
+        setState(() {
+          selectedVenues = selectedVenuesResult;
+        });
+      },
+      child: const Text('Select Venue'),
+    );
+  }
+
 
   void _saveEvent() {
     //validation
