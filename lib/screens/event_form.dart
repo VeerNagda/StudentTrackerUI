@@ -82,6 +82,7 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
+  // for date time
   Widget _buildDateRangeSelectionButton(String label, DateTime? startDate, DateTime? endDate) {
     return ElevatedButton(
       onPressed: () async {
@@ -92,7 +93,7 @@ class _EventFormState extends State<EventForm> {
             end: endDate ?? DateTime.now(),
           ),
           firstDate: DateTime.now(),
-          lastDate: DateTime(2101),
+          lastDate: DateTime(2080), //gave random year
           initialEntryMode: DatePickerEntryMode.calendarOnly,
         );
 
