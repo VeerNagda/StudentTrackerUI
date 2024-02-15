@@ -11,7 +11,7 @@ class EventFormResult {
 class EventForm extends StatefulWidget {
   final EventResponseModel? initialEvent; // Add initialEvent named parameter
 
-  const EventForm({super.key, this.initialEvent});
+  const EventForm({Key? key, this.initialEvent}) : super(key: key);
 
   @override
   _EventFormState createState() => _EventFormState();
@@ -52,9 +52,7 @@ class _EventFormState extends State<EventForm> {
               const SizedBox(height: 12),
               _buildTextFormField('Event Name', eventNameController),
               const SizedBox(height: 12),
-              _buildDateSelectionButton('Start Date', startDate),
-              const SizedBox(height: 12),
-              _buildDateSelectionButton('End Date', endDate),
+              _buildDateRangeSelectionButton('Date Range', startDate, endDate),
               const SizedBox(height: 12),
               _buildVenueSelectionButton(),
               const SizedBox(height: 12),
@@ -84,29 +82,63 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-  Widget _buildDateSelectionButton(String label, DateTime? date) {
+  Widget _buildDateRangeSelectionButton(String label, DateTime? startDate, DateTime? endDate) {
     return ElevatedButton(
       onPressed: () async {
-        DateTime? pickedDate = await showDatePicker(
+        DateTimeRange? pickedDateTimeRange = await showDateRangePicker(
           context: context,
-          initialDate: date ?? DateTime.now(),
+          initialDateRange: DateTimeRange(
+            start: startDate ?? DateTime.now(),
+            end: endDate ?? DateTime.now(),
+          ),
           firstDate: DateTime.now(),
           lastDate: DateTime(2101),
+          initialEntryMode: DatePickerEntryMode.calendarOnly,
         );
 
-        setState(() {
-          if (label == 'Start Date') {
-            startDate = pickedDate; // TODO parinaz Get time to
-          } else {
-            endDate = pickedDate;
+        if (pickedDateTimeRange != null) {
+          DateTime? startDateTime = (await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.fromDateTime(pickedDateTimeRange.start),
+          )) as DateTime?;
+
+          DateTime? endDateTime = (await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.fromDateTime(pickedDateTimeRange.end),
+          )) as DateTime?;
+
+          if (startDateTime != null && endDateTime != null) {
+            setState(() {
+              startDate = DateTime(
+                pickedDateTimeRange.start.year,
+                pickedDateTimeRange.start.month,
+                pickedDateTimeRange.start.day,
+                startDateTime.hour,
+                startDateTime.minute,
+              );
+
+              endDate = DateTime(
+                pickedDateTimeRange.end.year,
+                pickedDateTimeRange.end.month,
+                pickedDateTimeRange.end.day,
+                endDateTime.hour,
+                endDateTime.minute,
+              );
+            });
           }
-        });
-            },
-      child: Text('$label: ${date?.toLocal().toString() ?? ""}'),
+        }
+      },
+      child: Text('$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
     );
   }
 
-
+  String _formatDateTime(DateTime? dateTime) {
+    if (dateTime != null) {
+      return '${dateTime.toLocal().toString()}';
+    } else {
+      return '';
+    }
+  }
 
   Widget _buildSelectedVenuesText() {
     return Text('Selected Venues: ${selectedVenues.length}');
@@ -136,11 +168,9 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-
   void _saveEvent() {
     //validation
     if (eventIdController.text.isEmpty || eventNameController.text.isEmpty) {
-
       return;
     }
 
