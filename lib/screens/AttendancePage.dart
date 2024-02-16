@@ -1,12 +1,11 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 
 import 'TakePictureScreen.dart';
 
 class AttendancePage extends StatefulWidget {
-  final List<CameraDescription> cameras;
-
-  const AttendancePage({super.key, required this.cameras});
+  const AttendancePage({super.key});
 
   @override
   _AttendancePageState createState() => _AttendancePageState();
@@ -15,9 +14,12 @@ class AttendancePage extends StatefulWidget {
 class _AttendancePageState extends State<AttendancePage> {
   String? selectedEvent;
   String? selectedVenue;
+  late List<CameraDescription> cameras;
 
   List<String> availableEvents = ['Event 1', 'Event 2', 'Event 3'];
   List<String> availableVenues = ['Venue A', 'Venue B', 'Venue C'];
+
+  late String text = "click";
 
   @override
   Widget build(BuildContext context) {
@@ -31,50 +33,97 @@ class _AttendancePageState extends State<AttendancePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDropdown('Event Name', availableEvents, selectedEvent, (String? value) {
+            _buildDropdown('Event Name', availableEvents, selectedEvent,
+                (String? value) {
               setState(() {
                 selectedEvent = value;
               });
             }),
             const SizedBox(height: 16),
-            _buildDropdown('Venue', availableVenues, selectedVenue, (String? value) {
+            _buildDropdown('Venue', availableVenues, selectedVenue,
+                (String? value) {
               setState(() {
                 selectedVenue = value;
               });
             }),
             const SizedBox(height: 16),
             _buildClickPhotoButton(context),
+            _buildClassService(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDropdown(String label, List<String> items, String? selectedValue, void Function(String?) onChanged) {
+  Widget _buildDropdown(String label, List<String> items, String? selectedValue,
+      void Function(String?) onChanged) {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
       ),
       value: selectedValue,
-      items: items.map((item) => DropdownMenuItem<String>(value: item, child: Text(item))).toList(),
+      items: items
+          .map((item) =>
+              DropdownMenuItem<String>(value: item, child: Text(item)))
+          .toList(),
       onChanged: onChanged,
     );
   }
 
   Widget _buildClickPhotoButton(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
+      child: const Text('Click Photo'),
+      onPressed: () async {
+        cameras = await availableCameras();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => TakePictureScreen(camera: widget.cameras.first)),
+          MaterialPageRoute(
+              builder: (context) => TakePictureScreen(camera: cameras.first)),
         );
       },
-      child: const Text('Click Photo'),
+    );
+  }
+
+  Widget _buildClassService(BuildContext context) {
+    return Column(
+      children: [
+        ElevatedButton(
+          child: const Text('ForeGround'),
+          onPressed: () async {
+            FlutterBackgroundService().invoke('setAsForeground');
+          },
+        ),
+        ElevatedButton(
+          child: const Text('BackGround'),
+          onPressed: () async {
+            FlutterBackgroundService().invoke('setAsBackground');
+          },
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final service = FlutterBackgroundService();
+            bool isRunning = await service.isRunning();
+            if (isRunning) {
+              service.invoke("stopService");
+            } else {
+              service.startService();
+            }
+            if (!isRunning) {
+              text = "Stop Service";
+            } else {
+              text = "Start service";
+            }
+            setState(() {});
+          },
+          child: Text(text),
+        ),
+      ],
     );
   }
 }
 
+/*
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
@@ -84,3 +133,4 @@ void main() async {
     ),
   );
 }
+*/
