@@ -2,19 +2,23 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
+import 'package:ui/services/location_service.dart';
+
+
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
   await service.configure(
     iosConfiguration: IosConfiguration(
-      autoStart: true,
+      autoStart: false,
       onForeground: onStart,
       onBackground: onIosBackground,
     ),
     androidConfiguration: AndroidConfiguration(
-        onStart: onStart, isForegroundMode: true, autoStart: true),
+        onStart: onStart, isForegroundMode: false, autoStart: false),
   );
 }
 
@@ -33,13 +37,18 @@ void onStart(ServiceInstance service) {
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
-  Timer.periodic(const Duration(seconds: 1), (timer)async{
+  Timer.periodic(const Duration(minutes: 1), (timer)async{
     if (service is AndroidServiceInstance){
       if(await service.isForegroundService()){
         service.setForegroundNotificationInfo(title: "title", content: "content");
       }
     }
-    print("background service running");
+
+    //
+    if (kDebugMode) {
+      print("background service running");
+    }
+    await LocationService.getPosition();
     service.invoke('update');
   });
 

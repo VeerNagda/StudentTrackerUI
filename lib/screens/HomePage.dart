@@ -50,7 +50,7 @@ class HomePage extends StatelessWidget {
               className: 'BSC IT',
               rollNumber: 'A000',
             ),
-            const AttendancePage(cameras: [],),
+            const AttendancePage(),
           ],
         ),
       ),

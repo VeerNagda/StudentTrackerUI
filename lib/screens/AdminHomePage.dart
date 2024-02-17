@@ -29,7 +29,7 @@ class AdminHomePage extends StatelessWidget {
                 // TO DO VEER
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
               },
             ),
