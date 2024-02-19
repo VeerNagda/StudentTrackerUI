@@ -1,9 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/event/event_response_model.dart';
 
 class VenueSelectionScreen extends StatefulWidget {
+  const VenueSelectionScreen({super.key});
+
   @override
   _VenueSelectionScreenState createState() => _VenueSelectionScreenState();
 }
@@ -22,7 +23,7 @@ class _VenueSelectionScreenState extends State<VenueSelectionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Venues'),
+        title: const Text('Select Venues'),
       ),
       body: ListView.builder(
         itemCount: venues.length,
@@ -47,7 +48,7 @@ class _VenueSelectionScreenState extends State<VenueSelectionScreen> {
         onPressed: () {
           Navigator.pop(context, selectedVenues);
         },
-        child: Icon(Icons.check),
+        child: const Icon(Icons.check),
       ),
     );
   }

@@ -5,14 +5,14 @@ import 'package:ui/models/event/event_response_model.dart';
 import 'package:ui/services/api_service.dart';
 import 'event_form.dart';
 
-class EventsPage extends StatefulWidget {
-  const EventsPage({Key? key}) : super(key: key);
+class StudentPage extends StatefulWidget {
+  const StudentPage({Key? key}) : super(key: key);
 
   @override
-  _EventsPageState createState() => _EventsPageState();
+  _StudentPageState createState() => _StudentPageState();
 }
 
-class _EventsPageState extends State<EventsPage> {
+class _StudentPageState extends State<StudentPage> {
   late List<EventResponseModel> events = [];
 
   @override

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:ui/screens/AddVenuePage.dart';
+import 'package:ui/screens/VenuePage.dart';
 import 'package:ui/screens/login_page.dart';
 
 import 'EventsPage.dart';
+import 'StudentGroup.dart';
 
 void main() {
   runApp(const AdminHomePage());
 }
 
 class AdminHomePage extends StatelessWidget {
-  const AdminHomePage({Key? key}) : super(key: key);
+  const AdminHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +49,9 @@ class AdminHomePage extends StatelessWidget {
         body: const TabBarView(
           children: [
             EventsPage(),
-            AddVenuePage(),
-            AddVenuePage(), //not created student group page yet
-            AddVenuePage(), // not created attendance page yet
+            VenuesPage(),
+            StudentGroup(), //not created student group page yet
+            VenuesPage(), // not created attendance page yet
           ],
         ),
       ),

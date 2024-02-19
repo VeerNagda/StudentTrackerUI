@@ -204,7 +204,7 @@ class _MapScreenState extends State<MapScreen> {
                             _venueRequestModel.coordinates = _polyPoints;
                             await showDataAlert(context);
                           },
-                          child: const Text("hello")),
+                          child: const Text("Save")),
                       ElevatedButton(
                         onPressed: _getUserLocation,
                         child: const Icon(Icons.navigation),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ui/models/event/event_response_model.dart';
 import 'VenueSelectionScreen.dart';
 
+
 class EventFormResult {
   final EventResponseModel? event;
 
@@ -16,7 +17,6 @@ class EventForm extends StatefulWidget {
   @override
   _EventFormState createState() => _EventFormState();
 }
-
 class _EventFormState extends State<EventForm> {
   late TextEditingController eventIdController;
   late TextEditingController eventNameController;
@@ -28,16 +28,26 @@ class _EventFormState extends State<EventForm> {
   void initState() {
     super.initState();
 
-    // have Initialized controllers and other values based on the initialEvent
     eventIdController = TextEditingController(text: widget.initialEvent?.eventID ?? '');
     eventNameController = TextEditingController(text: widget.initialEvent?.eventName ?? '');
     startDate = widget.initialEvent?.startDate;
     endDate = widget.initialEvent?.endDate;
     selectedVenues = widget.initialEvent?.venue ?? [];
+
+    // event id is disabled
+    if (widget.initialEvent != null) {
+      eventIdController.text = widget.initialEvent!.eventID;
+      eventIdController..text = widget.initialEvent!.eventID;
+      eventIdController..selection = TextSelection.fromPosition(TextPosition(offset: eventIdController.text.length));
+      eventIdController..addListener(() {});
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
+    bool isEditing = widget.initialEvent != null;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Event Form'),
@@ -48,11 +58,11 @@ class _EventFormState extends State<EventForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildTextFormField('Event ID', eventIdController),
+              _buildTextFormField('Event ID', eventIdController, !isEditing), // Disable only when editing
               const SizedBox(height: 12),
-              _buildTextFormField('Event Name', eventNameController),
+              _buildTextFormField('Event Name', eventNameController, true), // Enable for both editing and creating
               const SizedBox(height: 12),
-              _buildDateRangeSelectionButton('Date Range', startDate, endDate),
+              _buildDateRangeSelectionButton('Start Date and End Date ', startDate, endDate),
               const SizedBox(height: 12),
               _buildVenueSelectionButton(),
               const SizedBox(height: 12),
@@ -65,14 +75,14 @@ class _EventFormState extends State<EventForm> {
       ),
     );
   }
-
-  Widget _buildTextFormField(String label, TextEditingController controller) {
+  Widget _buildTextFormField(String label, TextEditingController controller, bool enabled) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        // Removed border
       ),
+      enabled: enabled, // true false based
+      readOnly: !enabled,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter the $label';
@@ -81,58 +91,68 @@ class _EventFormState extends State<EventForm> {
       },
     );
   }
-
-  // for date time
+  //for date time
   Widget _buildDateRangeSelectionButton(String label, DateTime? startDate, DateTime? endDate) {
+    TimeOfDay? startTime;
+    TimeOfDay? endTime;
+
     return ElevatedButton(
       onPressed: () async {
-        DateTimeRange? pickedDateTimeRange = await showDateRangePicker(
+        DateTime? pickedStartDate = await showDatePicker(
           context: context,
-          initialDateRange: DateTimeRange(
-            start: startDate ?? DateTime.now(),
-            end: endDate ?? DateTime.now(),
-          ),
+          initialDate: startDate ?? DateTime.now(),
           firstDate: DateTime.now(),
-          lastDate: DateTime(2080), //gave random year
-          initialEntryMode: DatePickerEntryMode.calendarOnly,
+          lastDate: DateTime(2080),
         );
 
-        if (pickedDateTimeRange != null) {
-          DateTime? startDateTime = (await showTimePicker(
+        if (pickedStartDate != null) {
+          startTime = await showTimePicker(
             context: context,
-            initialTime: TimeOfDay.fromDateTime(pickedDateTimeRange.start),
-          )) as DateTime?;
+            initialTime: TimeOfDay.now(),
+          );
 
-          DateTime? endDateTime = (await showTimePicker(
-            context: context,
-            initialTime: TimeOfDay.fromDateTime(pickedDateTimeRange.end),
-          )) as DateTime?;
+          if (startTime != null) {
+            DateTime? pickedEndDate = await showDatePicker(
+              context: context,
+              initialDate: endDate ?? pickedStartDate,
+              firstDate: pickedStartDate,
+              lastDate: DateTime(2080),
+            );
 
-          if (startDateTime != null && endDateTime != null) {
-            setState(() {
-              startDate = DateTime(
-                pickedDateTimeRange.start.year,
-                pickedDateTimeRange.start.month,
-                pickedDateTimeRange.start.day,
-                startDateTime.hour,
-                startDateTime.minute,
+            if (pickedEndDate != null) {
+              endTime = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.now(),
               );
 
-              endDate = DateTime(
-                pickedDateTimeRange.end.year,
-                pickedDateTimeRange.end.month,
-                pickedDateTimeRange.end.day,
-                endDateTime.hour,
-                endDateTime.minute,
-              );
-            });
+              if (endTime != null) {
+                setState(() {
+                  startDate = DateTime(
+                    pickedStartDate.year,
+                    pickedStartDate.month,
+                    pickedStartDate.day,
+                    startTime!.hour,
+                    startTime!.minute,
+                  );
+
+                  endDate = DateTime(
+                    pickedEndDate.year,
+                    pickedEndDate.month,
+                    pickedEndDate.day,
+                    endTime!.hour,
+                    endTime!.minute,
+                  );
+                });
+              }
+            }
           }
         }
       },
-      child: Text('$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
+      child: Text('$label: ${_formatDateTime(startDate)} ${_formatTime(startTime)} - ${_formatDateTime(endDate)} ${_formatTime(endTime)}'),
     );
   }
 
+  //string representing date
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime != null) {
       return '${dateTime.toLocal().toString()}';
@@ -140,6 +160,19 @@ class _EventFormState extends State<EventForm> {
       return '';
     }
   }
+
+  //string representing time
+  // padLeft to ensure that both the hour and minute components are represented with two digits each
+  String _formatTime(TimeOfDay? time) {
+    if (time != null) {
+      final hours = time.hour.toString().padLeft(2, '0');
+      final minutes = time.minute.toString().padLeft(2, '0');
+      return '$hours:$minutes';
+    } else {
+      return '';
+    }
+  }
+
 
   Widget _buildSelectedVenuesText() {
     return Text('Selected Venues: ${selectedVenues.length}');
@@ -183,7 +216,6 @@ class _EventFormState extends State<EventForm> {
       venue: [],
     );
 
-    // Return the Event object to the previous screen
     Navigator.pop(context, EventFormResult(event: newEvent));
   }
 }
