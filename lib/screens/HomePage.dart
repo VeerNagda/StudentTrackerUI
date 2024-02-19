@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:go_router/go_router.dart';
 import '../services/shared_service.dart';
 import 'AttendancePage.dart';
 
 class HomePage extends StatelessWidget {
-
   const HomePage({super.key});
 
   @override
@@ -17,14 +17,19 @@ class HomePage extends StatelessWidget {
             icon: const Icon(Icons.person),
             onPressed: () {},
           ),
-
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-
                 SharedService.prefs.remove("accessToken");
                 SharedService.prefs.remove("role");
+                SharedService.prefs.remove("sapId");
+                FlutterBackgroundService().isRunning().then(
+                      (value) => {
+                        if (value)
+                          {FlutterBackgroundService().invoke("stopService")}
+                      },
+                    );
                 SharedService.isAuth = false;
                 context.goNamed("login");
               },
@@ -32,10 +37,8 @@ class HomePage extends StatelessWidget {
           ],
           bottom: const TabBar(
             tabs: [
-
               Tab(text: 'User Profile'),
               Tab(text: 'Attendance'),
-
             ],
           ),
           title: const Text("sapId"),

@@ -1,6 +1,10 @@
-import 'package:camera/camera.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ui/services/api_service.dart';
+import 'package:ui/services/shared_service.dart';
 
 import 'TakePictureScreen.dart';
 
@@ -13,13 +17,21 @@ class AttendancePage extends StatefulWidget {
 
 class _AttendancePageState extends State<AttendancePage> {
   String? selectedEvent;
-  String? selectedVenue;
-  late List<CameraDescription> cameras;
 
   List<String> availableEvents = ['Event 1', 'Event 2', 'Event 3'];
-  List<String> availableVenues = ['Venue A', 'Venue B', 'Venue C'];
 
   late String text = "click";
+
+  getAvailableEvents() async {
+    String availableEvent = await APIService.doGet(path: "/user/event/events-today/${SharedService.sapId}");
+    print(availableEvent);
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    getAvailableEvents();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +49,6 @@ class _AttendancePageState extends State<AttendancePage> {
                 (String? value) {
               setState(() {
                 selectedEvent = value;
-              });
-            }),
-            const SizedBox(height: 16),
-            _buildDropdown('Venue', availableVenues, selectedVenue,
-                (String? value) {
-              setState(() {
-                selectedVenue = value;
               });
             }),
             const SizedBox(height: 16),
@@ -75,12 +80,7 @@ class _AttendancePageState extends State<AttendancePage> {
     return ElevatedButton(
       child: const Text('Click Photo'),
       onPressed: () async {
-        cameras = await availableCameras();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => TakePictureScreen(camera: cameras.first)),
-        );
+        context.pushNamed('verify-user');
       },
     );
   }
@@ -89,21 +89,20 @@ class _AttendancePageState extends State<AttendancePage> {
     return Column(
       children: [
         ElevatedButton(
-          child: const Text('ForeGround'),
-          onPressed: () async {
-            FlutterBackgroundService().invoke('setAsForeground');
-          },
-        ),
-        ElevatedButton(
-          child: const Text('BackGround'),
-          onPressed: () async {
-            FlutterBackgroundService().invoke('setAsBackground');
-          },
-        ),
+            onPressed: () {
+              final service = FlutterBackgroundService();
+              Map<String, dynamic> data = {
+                "sap": SharedService.sapId,
+                "event_id": selectedEvent,
+              };
+              service.invoke("setData", data);
+            },
+            child: Text(text)),
         ElevatedButton(
           onPressed: () async {
             final service = FlutterBackgroundService();
             bool isRunning = await service.isRunning();
+
             if (isRunning) {
               service.invoke("stopService");
             } else {

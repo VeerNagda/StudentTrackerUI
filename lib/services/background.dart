@@ -2,12 +2,10 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:ui/services/location_service.dart';
-
-
+import 'package:ui/services/shared_service.dart';
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
@@ -22,36 +20,44 @@ Future<void> initializeService() async {
   );
 }
 
+
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) {
-  DartPluginRegistrant.ensureInitialized();
-  if (service is AndroidServiceInstance) {
-    service.on('setAsForeground').listen((event) {
-      service.setAsForegroundService();
-    });
-    service.on('setAsBackground').listen((event) {
-      service.setAsBackgroundService();
-    });
-  }
+    DartPluginRegistrant.ensureInitialized();
 
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-  });
-  Timer.periodic(const Duration(minutes: 1), (timer)async{
-    if (service is AndroidServiceInstance){
-      if(await service.isForegroundService()){
-        service.setForegroundNotificationInfo(title: "title", content: "content");
+
+    if (service is AndroidServiceInstance) {
+      service.setAsBackgroundService();
+    }
+
+
+    service.on('setData').listen((event) {
+
+      SharedService.sapId = event?["sap"];
+      SharedService.eventId = event?["event_id"];
+      //TODO end time
+
+    });
+
+
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
+    Timer.periodic(const Duration(minutes: 1), (timer) async {
+    if (service is AndroidServiceInstance) {
+      if (await service.isForegroundService()) {
+        service.setForegroundNotificationInfo(
+            title: "title", content: "content"); //TODO pari add info
       }
     }
-
-    //
-    if (kDebugMode) {
-      print("background service running");
-    }
     await LocationService.getPosition();
+
+
+    if (DateTime.now() == DateTime.now()) {
+      service.stopSelf();
+    }
     service.invoke('update');
   });
-
 }
 
 @pragma('vm:entry-point')

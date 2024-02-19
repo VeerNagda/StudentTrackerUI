@@ -25,7 +25,7 @@ class APIService {
     var response = await client.post(url,
         headers: requestHeaders, body: jsonEncode(model.toJson()));
     if (response.statusCode == 200) {
-      SharedService.setLoginDetails(loginResponseJson(response.body));
+      SharedService.setLoginDetails(loginResponseJson(response.body), model.sap);
       var role = SharedService.role;
       return role;
     } else if (response.statusCode == 401) {
@@ -36,7 +36,7 @@ class APIService {
   }
 
   static Future<int> doPostInsert(
-      {required BuildContext context,
+      {required BuildContext? context,
       required Map<String, dynamic> data,
       required String path}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
@@ -48,9 +48,11 @@ class APIService {
     var url = Uri.http(Constants.baseUri, "/api$path");
     try {
       var response =
-          await client.post(url, headers: requestHeaders, body: jsonEncode(data)  );
+          await client.post(url, headers: requestHeaders, body: jsonEncode(data));
       MessageModel messageModel = messageResponseJson(response.body);
-      toast(status: response.statusCode, message: messageModel.message);
+      if(context != null) {
+        toast(status: response.statusCode, message: messageModel.message);
+      }
       return response.statusCode;
     } catch (e) {
       if (kDebugMode) {

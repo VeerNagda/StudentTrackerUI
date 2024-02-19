@@ -10,17 +10,24 @@ class SharedService {
   static late SharedPreferences prefs;
   static bool isAuth = false;
   static int role = -1;
+  static late String sapId;
+  static late DateTime eventEndTime;
+  static late String eventId;
+  static late bool networkConnected = false;
+
+
+
   static Future<void> isLoggedIn() async {
     if (!isAuth) {
       prefs = await SharedPreferences.getInstance();
       isAuth = prefs.containsKey("accessToken");
       if(isAuth){
         role = prefs.getInt('role')!;
+        sapId = prefs.getString("sapId")!;
       }
     }
   }
 
-  // Redundant
   static Future<LoginResponseModel?> getLoginDetails() async {
     String? cacheAccessToken = prefs.getString("accessToken");
     int? cacheRole = prefs.getInt("role");
@@ -31,10 +38,12 @@ class SharedService {
     return loginResponseJson(json.encode(jsonData));
   }
 
-  static void setLoginDetails(LoginResponseModel model) {
+  static void setLoginDetails(LoginResponseModel model, String sap) {
     prefs.setString("accessToken", model.accessToken);
     prefs.setInt("role", model.role);
+    prefs.setString("sapId", sap);
     role=model.role;
+    sapId = sap ;
   }
 
   static Future<void> logout(BuildContext context) async {

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui/screens/AddVenuePage.dart';
 import 'package:ui/screens/VenuePage.dart';
 import 'package:ui/screens/login_page.dart';
 
+import '../services/shared_service.dart';
 import 'EventsPage.dart';
 import 'StudentGroup.dart';
 
@@ -29,10 +31,11 @@ class AdminHomePage extends StatelessWidget {
               onPressed: () {
                 // have not used go router yet
                 // TO DO VEER
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
+                SharedService.prefs.remove("accessToken");
+                SharedService.prefs.remove("role");
+                SharedService.prefs.remove("sapId");
+                SharedService.isAuth = false;
+                context.goNamed("login");
               },
             ),
           ],
