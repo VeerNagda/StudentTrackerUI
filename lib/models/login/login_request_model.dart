@@ -1,5 +1,4 @@
 
-import 'package:ui/services/shared_service.dart';
 
 class LoginRequestModel {
   late String _sap;

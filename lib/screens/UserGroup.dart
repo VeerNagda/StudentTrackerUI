@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ui/screens/AddVenuePage.dart';
-import 'package:ui/screens/VenuePage.dart';
-import 'package:ui/screens/login_page.dart';
-import 'EventsPage.dart';
 import 'GroupPage.dart';
-import 'StudentPage.dart';
+import 'CreateUserPage.dart';
 
 class StudentGroup extends StatelessWidget {
   const StudentGroup({super.key});
@@ -15,16 +11,16 @@ class StudentGroup extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: TabBar(
+          title: const TabBar(
             tabs: [
-              Tab(text: 'Student'),
+              Tab(text: 'New User'),
               Tab(text: 'Group'),
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
-            StudentPage(),
+            CreateUserPage(),
             GroupPage(),
           ],
         ),

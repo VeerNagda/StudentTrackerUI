@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -6,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ui/services/api_service.dart';
 import 'package:ui/services/shared_service.dart';
 
-import 'TakePictureScreen.dart';
 
 class AttendancePage extends StatefulWidget {
   const AttendancePage({super.key});

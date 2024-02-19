@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui/screens/AddVenuePage.dart';
 import 'package:ui/screens/VenuePage.dart';
-import 'package:ui/screens/login_page.dart';
 
 import '../services/shared_service.dart';
 import 'EventsPage.dart';
-import 'StudentGroup.dart';
+import 'UserGroup.dart';
 
 void main() {
   runApp(const AdminHomePage());

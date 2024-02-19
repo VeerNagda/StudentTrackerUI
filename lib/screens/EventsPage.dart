@@ -6,7 +6,7 @@ import 'package:ui/services/api_service.dart';
 import 'event_form.dart';
 
 class EventsPage extends StatefulWidget {
-  const EventsPage({Key? key}) : super(key: key);
+  const EventsPage({super.key});
 
   @override
   _EventsPageState createState() => _EventsPageState();

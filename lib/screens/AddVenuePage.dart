@@ -5,7 +5,7 @@ class AddVenuePage extends StatefulWidget {
   final VenueResponseModel? initialVenue;
   final Function(VenueResponseModel) onSaveVenue;
 
-  const AddVenuePage({Key? key, this.initialVenue, required this.onSaveVenue}) : super(key: key);
+  const AddVenuePage({super.key, this.initialVenue, required this.onSaveVenue});
 
   @override
   _AddVenuePageState createState() => _AddVenuePageState();
@@ -25,9 +25,9 @@ class _AddVenuePageState extends State<AddVenuePage> {
     // event id is disabled
     if (widget.initialVenue != null) {
       venueIdController.text = widget.initialVenue!.venueID;
-      venueIdController..text = widget.initialVenue!.venueID;
-      venueIdController..selection = TextSelection.fromPosition(TextPosition(offset: venueIdController.text.length));
-      venueIdController..addListener(() {});
+      venueIdController.text = widget.initialVenue!.venueID;
+      venueIdController.selection = TextSelection.fromPosition(TextPosition(offset: venueIdController.text.length));
+      venueIdController.addListener(() {});
     }
   }
 

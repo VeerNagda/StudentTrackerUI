@@ -5,7 +5,7 @@ import 'package:ui/screens/AddGroup.dart';
 import 'package:ui/services/api_service.dart';
 
 class GroupPage extends StatefulWidget {
-  const GroupPage({Key? key}) : super(key: key);
+  const GroupPage({super.key});
 
   @override
   _GroupPageState createState() => _GroupPageState();
@@ -66,13 +66,13 @@ class _GroupPageState extends State<GroupPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.edit),
+                      icon: const Icon(Icons.edit),
                       onPressed: () {
                         _navigateToEditGroup(groups[index]);
                       },
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete),
+                      icon: const Icon(Icons.delete),
                       onPressed: () {
                         _showDeleteConfirmationDialog(groups[index]);
                       },
@@ -153,7 +153,8 @@ class _GroupPageState extends State<GroupPage> {
   }
 
   _deleteGroup(GroupResponseModel group) {
-    int groupNumber = group.groupNumber;
+    int groupNumber = group.groupNumber ?? 0; // Provide a default value if groupNumber is null
+
     APIService.doDelete(path: "/admin/delete-group", query: {"groupNumber": groupNumber.toString()})
         .then((value) {
       if (value == "Success") {
@@ -188,14 +189,14 @@ class _GroupPageState extends State<GroupPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Error'),
-            content: Text('Please provide valid group information.'),
+            title: const Text('Error'),
+            content: const Text('Please provide valid group information.'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           );

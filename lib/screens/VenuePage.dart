@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/venue/venue_response_model.dart';
@@ -8,7 +7,7 @@ import '../services/api_service.dart';
 import 'AddVenuePage.dart';
 
 class VenuesPage extends StatefulWidget {
-  const VenuesPage({Key? key}) : super(key: key);
+  const VenuesPage({super.key});
 
   @override
   _VenuesPageState createState() => _VenuesPageState();
@@ -79,13 +78,13 @@ class _VenuesPageState extends State<VenuesPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.edit),
+                      icon: const Icon(Icons.edit),
                       onPressed: () {
                         _navigateToEditVenue(venues[index]);
                       },
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete),
+                      icon: const Icon(Icons.delete),
                       onPressed: () {
                         _showDeleteConfirmationDialog(venues[index]);
                       },

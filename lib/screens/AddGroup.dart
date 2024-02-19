@@ -7,7 +7,6 @@ class GroupResult {
   GroupResult({this.group});
 }
 
-
 class AddGroup extends StatefulWidget {
   final Function(GroupResponseModel) onSaveGroup;
   final GroupResponseModel? initialGroup;
@@ -19,23 +18,27 @@ class AddGroup extends StatefulWidget {
 }
 
 class _AddGroupState extends State<AddGroup> {
-  late TextEditingController descriptionController;
+  late TextEditingController nameController;
+  late TextEditingController groupNumberController;
   late List<String> studentNames;
   late GroupResponseModel group;
 
   @override
   void initState() {
     super.initState();
-    descriptionController = TextEditingController();
+    nameController = TextEditingController();
+    groupNumberController = TextEditingController();
     studentNames = [];
-    group = widget.initialGroup ?? GroupResponseModel(groupNumber: 0, members: [], description: '');
+    group = widget.initialGroup ?? GroupResponseModel(groupNumber: null, members: [], name: '');
     studentNames.addAll(group.members);
-    descriptionController.text = group.description;
+    nameController.text = group.name;
+    initialValue: group.groupNumber != null ? group.groupNumber.toString() : '';
   }
 
   @override
   void dispose() {
-    descriptionController.dispose();
+    nameController.dispose();
+    groupNumberController.dispose();
     super.dispose();
   }
 
@@ -53,9 +56,9 @@ class _AddGroupState extends State<AddGroup> {
 
   void _saveGroup() {
     GroupResponseModel newGroup = GroupResponseModel(
-      groupNumber: group.groupNumber,
+      groupNumber: int.parse(groupNumberController.text), // Parse group number from text
       members: studentNames,
-      description: descriptionController.text,
+      name: nameController.text,
     );
 
     widget.onSaveGroup(newGroup);
@@ -74,9 +77,22 @@ class _AddGroupState extends State<AddGroup> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextFormField(
-              controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'Name'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: groupNumberController,
+                decoration: const InputDecoration(labelText: 'Group ID'),
+                keyboardType: TextInputType.number, // Set keyboard type to number
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
             ),
             const SizedBox(height: 20),
             Text(

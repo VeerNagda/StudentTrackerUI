@@ -12,7 +12,7 @@ class EventFormResult {
 class EventForm extends StatefulWidget {
   final EventResponseModel? initialEvent; // Add initialEvent named parameter
 
-  const EventForm({Key? key, this.initialEvent}) : super(key: key);
+  const EventForm({super.key, this.initialEvent});
 
   @override
   _EventFormState createState() => _EventFormState();
@@ -37,9 +37,9 @@ class _EventFormState extends State<EventForm> {
     // event id is disabled
     if (widget.initialEvent != null) {
       eventIdController.text = widget.initialEvent!.eventID;
-      eventIdController..text = widget.initialEvent!.eventID;
-      eventIdController..selection = TextSelection.fromPosition(TextPosition(offset: eventIdController.text.length));
-      eventIdController..addListener(() {});
+      eventIdController.text = widget.initialEvent!.eventID;
+      eventIdController.selection = TextSelection.fromPosition(TextPosition(offset: eventIdController.text.length));
+      eventIdController.addListener(() {});
     }
   }
 
@@ -155,7 +155,7 @@ class _EventFormState extends State<EventForm> {
   //string representing date
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime != null) {
-      return '${dateTime.toLocal().toString()}';
+      return dateTime.toLocal().toString();
     } else {
       return '';
     }
@@ -192,7 +192,7 @@ class _EventFormState extends State<EventForm> {
       onPressed: () async {
         List<Venue> selectedVenuesResult = await Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => VenueSelectionScreen()),
+          MaterialPageRoute(builder: (context) => const VenueSelectionScreen()),
         );
         setState(() {
           selectedVenues = selectedVenuesResult;
