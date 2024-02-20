@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ui/services/api_service.dart';
+
 
 // A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
@@ -17,10 +21,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late Future<void>? _initializeControllerFuture;
   late CameraDescription? camera;
 
+  late String text = "";
+
   @override
   void initState() {
     super.initState();
     initCamera();
+    FlutterBackgroundService().invoke("stopService");
   }
 
   void initCamera() async {
@@ -79,17 +86,14 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             final image = await _controller.takePicture();
 
             if (!mounted) return;
-
+            int response = await APIService.doMultipartPost(path: "/user/event/verify-user", image: image);
+            if(response == 200){
+              FlutterBackgroundService().startService();
+            }
             // If the picture was taken, display it on a new screen.
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  // Pass the automatically generated path to
-                  // the DisplayPictureScreen widget.
-                  imagePath: image.path,
-                ),
-              ),
-            );
+            if(mounted){
+              context.goNamed("home");
+            }
           } catch (e) {
             // If an error occurs, log the error to the console.
             if (kDebugMode) {
@@ -101,6 +105,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       ),
     );
   }
+
+
+
+
+
 }
 
 // A widget that displays the picture taken by the user.

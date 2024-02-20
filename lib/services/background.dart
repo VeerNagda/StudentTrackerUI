@@ -20,38 +20,29 @@ Future<void> initializeService() async {
   );
 }
 
-
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) {
-    DartPluginRegistrant.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
 
+  if (service is AndroidServiceInstance) {
+    service.setAsBackgroundService();
+  }
 
+  service.on('setData').listen((event) {
+    SharedService.sapId = event?["sap"];
+    SharedService.eventId = event?["event_id"];
+    SharedService.eventEndTime = event?["event_end_time"];
+  });
+
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+  });
+  Timer.periodic(const Duration(minutes: 1), (timer) async {
     if (service is AndroidServiceInstance) {
-      service.setAsBackgroundService();
-    }
-
-
-    service.on('setData').listen((event) {
-
-      SharedService.sapId = event?["sap"];
-      SharedService.eventId = event?["event_id"];
-      //TODO end time
-
-    });
-
-
-    service.on('stopService').listen((event) {
-      service.stopSelf();
-    });
-    Timer.periodic(const Duration(minutes: 1), (timer) async {
-    if (service is AndroidServiceInstance) {
-      if (await service.isForegroundService()) {
-        service.setForegroundNotificationInfo(
-            title: "title", content: "content"); //TODO pari add info
-      }
+      service.setForegroundNotificationInfo(
+          title: "title", content: "content"); //TODO pari add info
     }
     await LocationService.getPosition();
-
 
     if (DateTime.now() == DateTime.now()) {
       service.stopSelf();

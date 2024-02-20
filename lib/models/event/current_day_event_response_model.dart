@@ -1,3 +1,19 @@
+import 'dart:convert';
+
+CurrentDayEventResponseModel currentDayEventJson(String str) =>
+    CurrentDayEventResponseModel.fromJson(jsonDecode(str));
+
+DateTime? findEndTimeByEventId(
+    CurrentDayEventResponseModel model, String eventId) {
+  Events? event = model.events
+      ?.firstWhere((element) => element.ID == eventId);
+  if (event != null) {
+    return DateTime.parse(event.endDate!);
+  } else {
+    return null; // Return null if event is not found
+  }
+}
+
 class CurrentDayEventResponseModel {
   List<Events>? events;
 
@@ -22,21 +38,21 @@ class CurrentDayEventResponseModel {
 }
 
 class Events {
-  String? iD;
+  String? ID;
   String? name;
   String? endDate;
 
-  Events({this.iD, this.name, this.endDate});
+  Events({this.ID, this.name, this.endDate});
 
   Events.fromJson(Map<String, dynamic> json) {
-    iD = json['ID'];
+    ID = json['ID'];
     name = json['Name'];
     endDate = json['End_Date'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['ID'] = iD;
+    data['ID'] = ID;
     data['Name'] = name;
     data['End_Date'] = endDate;
     return data;

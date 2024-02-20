@@ -15,7 +15,7 @@ class LocationService {
 
   static Future<void> getPosition() async {
     try {
-      Position position = await _getCurrentPosition();
+      Position position = await getCurrentPosition();
       coordinates.add(LatLng(position.latitude, position.longitude));
     } catch (e) {
       if (kDebugMode) {
@@ -36,7 +36,7 @@ class LocationService {
     }
   }
 
-  static Future<Position> _getCurrentPosition() async {
+  static Future<Position> getCurrentPosition() async {
     return await Geolocator.getCurrentPosition();
   }
 }

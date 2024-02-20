@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:ui/models/login/login_request_model.dart';
 import 'package:ui/models/login/login_response_model.dart';
 import 'package:ui/models/messageModel.dart';
+import 'package:ui/services/location_service.dart';
 import 'package:ui/services/shared_service.dart';
 import 'package:ui/utils/constants.dart';
 
@@ -25,7 +28,8 @@ class APIService {
     var response = await client.post(url,
         headers: requestHeaders, body: jsonEncode(model.toJson()));
     if (response.statusCode == 200) {
-      SharedService.setLoginDetails(loginResponseJson(response.body), model.sap);
+      SharedService.setLoginDetails(
+          loginResponseJson(response.body), model.sap);
       var role = SharedService.role;
       return role;
     } else if (response.statusCode == 401) {
@@ -47,10 +51,10 @@ class APIService {
     };
     var url = Uri.http(Constants.baseUri, "/api$path");
     try {
-      var response =
-          await client.post(url, headers: requestHeaders, body: jsonEncode(data));
+      var response = await client.post(url,
+          headers: requestHeaders, body: jsonEncode(data));
       MessageModel messageModel = messageResponseJson(response.body);
-      if(context != null) {
+      if (context != null) {
         toast(status: response.statusCode, message: messageModel.message);
       }
       return response.statusCode;
@@ -62,26 +66,28 @@ class APIService {
     }
   }
 
-  static Future<String> doGet({required String path, Map<String, String>? query})async {
+  static Future<String> doGet(
+      {required String path, Map<String, String>? query}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${loginData!.accessToken}',
     };
     Uri url;
-    if(query == null) {
-       url = Uri.http(Constants.baseUri, "/api$path", query);
-    }else {
+    if (query == null) {
+      url = Uri.http(Constants.baseUri, "/api$path", query);
+    } else {
       url = Uri.http(Constants.baseUri, "/api$path", query);
     }
     var response = await client.get(url, headers: requestHeaders);
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       return response.body;
     }
     return "";
   }
 
-  static Future<String> doDelete({required String path, Map<String, String>? query}) async {
+  static Future<String> doDelete(
+      {required String path, Map<String, String>? query}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
@@ -97,12 +103,39 @@ class APIService {
 
     var response = await http.delete(url, headers: requestHeaders);
 
-    if (response.statusCode == 204) { // Assuming 204 is returned for successful delete
+    if (response.statusCode == 204) {
+      // Assuming 204 is returned for successful delete
       return "Success"; // You can return any appropriate message or indicator
     } else {
       return "Failed"; // You can return any appropriate message or indicator
     }
   }
 
+  static Future<int> doMultipartPost(
+      {required String path,
+      required XFile image}) async {
+    Uri url = Uri.http(Constants.baseUri, "/api$path/${SharedService.sapId}");
+    var request = http.MultipartRequest('POST', url);
 
+    Position position = await LocationService.getCurrentPosition();
+    String coordinates = "${position.latitude} ${position.longitude}";
+
+    var imageStream = http.ByteStream(image.openRead());
+    var length = await image.length();
+    var multipartFile = http.MultipartFile('image', imageStream, length,
+        filename: image.path.split('/').last);
+    request.files.add(multipartFile);
+    request.fields['location'] = coordinates;
+    request.fields['eventId'] = SharedService.eventId;
+
+
+    var response = await http.Response.fromStream(await request.send());
+    if (response.statusCode == 200) {
+      print('Image uploaded successfully!');
+      print('Response: ${response.body}');
+    } else {
+      print('Failed to upload image. Error: ${response.reasonPhrase}');
+    }
+    return response.statusCode;
+  }
 }

@@ -1,10 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ui/models/event/current_day_event_response_model.dart';
 import 'package:ui/services/api_service.dart';
 import 'package:ui/services/shared_service.dart';
-
 
 class AttendancePage extends StatefulWidget {
   const AttendancePage({super.key});
@@ -17,16 +16,21 @@ class _AttendancePageState extends State<AttendancePage> {
   String? selectedEvent;
 
   List<String> availableEvents = ['Event 1', 'Event 2', 'Event 3'];
-
-  late String text = "click";
+  Map<String, String> eventsMap = {};
+  late CurrentDayEventResponseModel currentDayEventResponseModel;
 
   getAvailableEvents() async {
-    String availableEvent = await APIService.doGet(path: "/user/event/events-today/${SharedService.sapId}");
-    print(availableEvent);
+    currentDayEventResponseModel = currentDayEventJson(await APIService.doGet(
+        path: "/user/event/events-today/${SharedService.sapId}"));
+
+    currentDayEventResponseModel.events?.forEach((event) {
+      eventsMap[event.ID!] = event.name!;
+    });
+    setState(() {});
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     getAvailableEvents();
   }
@@ -43,7 +47,7 @@ class _AttendancePageState extends State<AttendancePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDropdown('Event Name', availableEvents, selectedEvent,
+            _buildDropdown('Event Name', eventsMap, selectedEvent,
                 (String? value) {
               setState(() {
                 selectedEvent = value;
@@ -51,71 +55,47 @@ class _AttendancePageState extends State<AttendancePage> {
             }),
             const SizedBox(height: 16),
             _buildClickPhotoButton(context),
-            _buildClassService(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDropdown(String label, List<String> items, String? selectedValue,
-      void Function(String?) onChanged) {
+  Widget _buildDropdown(String label, Map<String, String> items,
+      String? selectedValue, void Function(String?) onChanged) {
     return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
       ),
       value: selectedValue,
-      items: items
-          .map((item) =>
-              DropdownMenuItem<String>(value: item, child: Text(item)))
-          .toList(),
+      items: eventsMap.entries.map((MapEntry<String, String> entry) {
+        return DropdownMenuItem<String>(
+          value: entry.key,
+          child: Text(entry.value),
+        );
+      }).toList(),
       onChanged: onChanged,
     );
   }
 
   Widget _buildClickPhotoButton(BuildContext context) {
     return ElevatedButton(
-      child: const Text('Click Photo'),
-      onPressed: () async {
-        context.pushNamed('verify-user');
-      },
-    );
-  }
-
-  Widget _buildClassService(BuildContext context) {
-    return Column(
-      children: [
-        ElevatedButton(
-            onPressed: () {
-              final service = FlutterBackgroundService();
+      onPressed: selectedEvent != null && selectedEvent!.isNotEmpty
+          ? () async {
+              SharedService.eventId = selectedEvent!;
+              SharedService.eventEndTime = findEndTimeByEventId(
+                  currentDayEventResponseModel, selectedEvent!)!;
               Map<String, dynamic> data = {
                 "sap": SharedService.sapId,
-                "event_id": selectedEvent,
+                "event_id": SharedService.eventId,
+                "event_end_time": SharedService.eventEndTime,
               };
-              service.invoke("setData", data);
-            },
-            child: Text(text)),
-        ElevatedButton(
-          onPressed: () async {
-            final service = FlutterBackgroundService();
-            bool isRunning = await service.isRunning();
-
-            if (isRunning) {
-              service.invoke("stopService");
-            } else {
-              service.startService();
+              FlutterBackgroundService().invoke("setData", data);
+              context.pushNamed('verify-user');
             }
-            if (!isRunning) {
-              text = "Stop Service";
-            } else {
-              text = "Start service";
-            }
-            setState(() {});
-          },
-          child: Text(text),
-        ),
-      ],
+          : null,
+      child: const Text('Click Photo'),
     );
   }
 }

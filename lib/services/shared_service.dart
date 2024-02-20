@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../models/login/login_response_model.dart';
 
 class SharedService {
@@ -45,6 +47,36 @@ class SharedService {
     role=model.role;
     sapId = sap ;
   }
+
+
+  Future<bool> checkLocationService() async {
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await Geolocator.openLocationSettings();
+      if (!serviceEnabled) {
+        return false;
+      }
+    }
+
+    permissionGranted = await Permission.location.status;
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await Permission.location.request();
+      if (permissionGranted != PermissionStatus.granted) {
+        return false;
+      }
+    }
+
+    if (permissionGranted == PermissionStatus.granted) {
+      // Location service is enabled and permission granted.
+      // You can proceed with accessing the location.
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 
   static Future<void> logout(BuildContext context) async {
     prefs.clear();

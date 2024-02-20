@@ -6,7 +6,10 @@ import 'package:ui/services/background.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Permission.notification.isDenied.then((value) => {if(value){Permission.notification.request()}});
-  await Permission.locationWhenInUse.isDenied.then((value) => {if(value){Permission.locationWhenInUse.request()}});
+  await Permission.camera.isDenied.then((value) => {if(value){Permission.notification.request()}});
+  await Permission.audio.isDenied.then((value) => {if(value){Permission.notification.request()}});
+  await Permission.location.isDenied.then((value) => {if(value){Permission.location.request()}});
+  await Permission.locationAlways.isDenied.then((value) => {if(value){Permission.locationAlways.request()}});
   await initializeService();
   runApp(const MyApp());
 
