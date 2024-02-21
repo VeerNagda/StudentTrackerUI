@@ -1,186 +1,114 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'dart:convert';
-import 'package:ui/models/event/event_response_model.dart';
-import 'package:ui/services/api_service.dart';
-import 'event_form.dart';
+import 'AddSingleUser.dart';
 
-class CreateUserPage extends StatefulWidget {
-  const CreateUserPage({super.key});
-
-  @override
-  _CreateUserPageState createState() => _CreateUserPageState();
-}
-
-class _CreateUserPageState extends State<CreateUserPage> {
-  late List<EventResponseModel> events = [];
-
-  @override
-  void initState() {
-    super.initState();
-    APIService.doGet(path: "/admin/get-upcoming-events").then((value) => {
-      if (value != "")
-        {
-          setState(() {
-            events = jsonDecode(value)
-                .map<EventResponseModel>(
-                    (item) => EventResponseModel.fromJson(item))
-                .toList();
-          }),
-          print(events)
-        }
-    });
-  }
+class CreateUserPage extends StatelessWidget {
+  const CreateUserPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Events'),
-        automaticallyImplyLeading: false,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: events.isEmpty
-            ? const Center(
-          child: Text(
-            'No events yet. '
-                'Tap the + button to add an event.',
-            style: TextStyle(fontSize: 16.0),
-          ),
-        )
-            : ListView.builder(
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 5,
-              margin:
-              const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: ListTile(
-                title: Text(events[index].eventName),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Venues: ${events[index].venue?.length}'),
-                    Text('Date: ${_formatDateTime(events[index].startDate)} - ${_formatDateTime(events[index].endDate)}'),
-                  ],
-                ),
-                onTap: () {
-                  _navigateToEventDetails(events[index]);
-                },
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        _navigateToEventFormForEditing(events[index]);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(events[index]);
-                      },
-                    ),
-                  ],
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+            const Text(
+              'Users:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columns: const [
+                  DataColumn(label: Text('SAP ID')),
+                  DataColumn(label: Text('First Name')),
+                  DataColumn(label: Text('Last Name')),
+                  DataColumn(label: Text('Roll No')),
+                  DataColumn(label: Text('Role')),
+                ],
+                rows: [
+                  // TODO: Add rows dynamically
+                  DataRow(cells: [
+                    DataCell(Text('45207210001')),
+                    DataCell(Text('Parinaz')),
+                    DataCell(Text('Bharucha')),
+                    DataCell(Text('A004')),
+                    DataCell(Text('Student')),
+                  ]),
+                ],
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _navigateToEventForm();
+          // Show modal bottom sheet with options
+          showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.person_add),
+                    title: Text('Add Single User'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddSingleUserPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.people_alt),
+                    title: Text('Add Bulk Users'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showAddBulkUsersDialog(context);
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         },
-        tooltip: 'Add Event',
+        tooltip: 'Add User',
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  _navigateToEventForm() async {
-    EventFormResult result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const EventForm()),
-    );
+  //pop up wala part for bulk user
+  void _showAddBulkUsersDialog(BuildContext context) {
 
-    if (result.event != null) {
-      setState(() {
-        events.add(result.event!);
-      });
-    }
-  }
-
-  _navigateToEventFormForEditing(EventResponseModel event) async {
-    EventFormResult result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EventForm(initialEvent: event),
-      ),
-    );
-
-    if (result.event != null) {
-      setState(() {
-        events.remove(event);
-        events.add(result.event!);
-      });
-    }
-  }
-
-  _showDeleteConfirmationDialog(EventResponseModel event) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Event'),
-          content: const Text('Are you sure you want to delete this event?'),
+          title: Text('Add Excel File'),
+          content: Text('Still need to do that excel wala part'), // You can customize the content as needed
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancel'),
+              child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                _deleteEvent(event);
                 Navigator.pop(context);
               },
-              child: const Text('Delete'),
+              child: Text('Add'),
             ),
           ],
         );
       },
     );
-  }
-
-  _deleteEvent(EventResponseModel event) {
-    Map<String, String> query = {
-      "eventId": event.eventID
-    };
-    APIService.doDelete(path: "/admin/delete-event", query: query).then((value) => {
-      if (value == "Success")
-        {
-          setState(() {
-            events.remove(event);
-          })
-        }
-    });
-  }
-
-  _navigateToEventDetails(EventResponseModel selectedEvent) {
-    print('Selected Event Details:');
-    print('Event ID: ${selectedEvent.eventID}');
-    print('Event Name: ${selectedEvent.eventName}');
-  }
-
-  String _formatDateTime(DateTime? dateTime) {
-    if (dateTime != null) {
-      return DateFormat.yMMMMd().add_jm().format(dateTime);
-    } else {
-      return '';
-    }
   }
 }

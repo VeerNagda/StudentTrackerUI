@@ -5,7 +5,7 @@ import 'package:ui/screens/AddGroup.dart';
 import 'package:ui/services/api_service.dart';
 
 class GroupPage extends StatefulWidget {
-  const GroupPage({super.key});
+  const GroupPage({Key? key}) : super(key: key);
 
   @override
   _GroupPageState createState() => _GroupPageState();
@@ -95,10 +95,51 @@ class _GroupPageState extends State<GroupPage> {
   }
 
   _navigateToAddGroup() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddGroup(onSaveGroup: _saveGroup)),
+    TextEditingController groupIdController = TextEditingController();
+    TextEditingController groupNameController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Group'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: groupIdController,
+                decoration: InputDecoration(labelText: 'Group ID'),
+              ),
+              TextField(
+                controller: groupNameController,
+                decoration: InputDecoration(labelText: 'Group Name'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                GroupResponseModel newGroup = GroupResponseModel(
+                  groupNumber: int.tryParse(groupIdController.text) ?? 1,
+                  name: groupNameController.text,
+                  members: [],
+                );
+                _saveGroup(newGroup);
+                Navigator.pop(context);
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
     );
+
     _fetchGroups();
   }
 
@@ -153,7 +194,7 @@ class _GroupPageState extends State<GroupPage> {
   }
 
   _deleteGroup(GroupResponseModel group) {
-    int groupNumber = group.groupNumber ?? 0; // Provide a default value if groupNumber is null
+    int groupNumber = group.groupNumber ?? 1;
 
     APIService.doDelete(path: "/admin/delete-group", query: {"groupNumber": groupNumber.toString()})
         .then((value) {
@@ -183,6 +224,7 @@ class _GroupPageState extends State<GroupPage> {
     print('Group Number: ${selectedGroup.groupNumber}');
     print('Number of Members: ${selectedGroup.members.length}');
   }
+
   _saveGroup(GroupResponseModel group) {
     if (group.groupNumber == 0 || group.members.isEmpty) {
       showDialog(
@@ -213,6 +255,24 @@ class _GroupPageState extends State<GroupPage> {
       });
 
       Navigator.pop(context);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Success'),
+            content: const Text('Saved successfully.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 

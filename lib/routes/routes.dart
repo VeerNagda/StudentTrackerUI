@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:path/path.dart';
 import 'package:ui/screens/AdminHomePage.dart';
 import 'package:ui/screens/HomePage.dart';
 import 'package:ui/screens/TakePictureScreen.dart';
