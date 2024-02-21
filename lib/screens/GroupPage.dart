@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ui/models/StudentGroup/create_group_request_model.dart';
+import 'package:ui/models/StudentGroup/group_list_response_model.dart';
 import 'package:ui/models/StudentGroup/group_response_model.dart';
 import 'package:ui/screens/AddGroup.dart';
 import 'package:ui/services/api_service.dart';
@@ -12,7 +15,10 @@ class GroupPage extends StatefulWidget {
 }
 
 class _GroupPageState extends State<GroupPage> {
-  late List<GroupResponseModel> groups = [];
+  late List<GroupResponseModel> groups1 = [];
+  late List<GroupListResponseModel> groups = [];
+
+
 
   @override
   void initState() {
@@ -21,14 +27,19 @@ class _GroupPageState extends State<GroupPage> {
   }
 
   void _fetchGroups() {
-    APIService.doGet(path: "/admin/get-groups").then((value) {
-      if (value != "") {
-        setState(() {
-          groups = (jsonDecode(value) as List)
-              .map((item) => GroupResponseModel.fromJson(item))
-              .toList();
-        });
-      }
+
+
+    APIService.doGet(path: "/admin/group/all-groups").then((value) => {
+      if (value != "")
+        {
+          setState(() {
+            groups = jsonDecode(value)
+                .map<GroupListResponseModel>(
+                    (item) => GroupListResponseModel.fromJson(item))
+                .toList();
+          }),
+          print(groups)
+        }
     });
   }
 
@@ -43,46 +54,46 @@ class _GroupPageState extends State<GroupPage> {
         padding: const EdgeInsets.all(8.0),
         child: groups.isEmpty
             ? const Center(
-          child: Text(
-            'No groups yet. Tap the + button to add a group.',
-            style: TextStyle(fontSize: 16.0),
-          ),
-        )
-            : ListView.builder(
-          itemCount: groups.length,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 5,
-              margin: const EdgeInsets.symmetric(
-                  vertical: 8, horizontal: 16),
-              child: ListTile(
-                title: Text('Group ${groups[index].groupNumber}'),
-                subtitle: Text(
-                    'Members: ${groups[index].members.length}'),
-                onTap: () {
-                  _navigateToGroupDetails(groups[index]);
-                },
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        _navigateToEditGroup(groups[index]);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(groups[index]);
-                      },
-                    ),
-                  ],
+                child: Text(
+                  'No groups yet. Tap the + button to add a group.',
+                  style: TextStyle(fontSize: 16.0),
                 ),
+              )
+            : ListView.builder(
+                itemCount: groups.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 5,
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListTile(
+                      title: Text('Group ${groups[index].name}'),
+                      subtitle:
+                          Text('Members: ${groups[index].numMembers}'),
+                      onTap: () {
+                        _navigateToGroupDetails(groups1[index]);
+                      },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              _navigateToEditGroup(groups[index]);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              _showDeleteConfirmationDialog(groups[index]);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -124,16 +135,19 @@ class _GroupPageState extends State<GroupPage> {
               child: Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                GroupResponseModel newGroup = GroupResponseModel(
-                  groupNumber: int.tryParse(groupIdController.text) ?? 1,
-                  name: groupNameController.text,
-                  members: [],
-                );
-                _saveGroup(newGroup);
-                Navigator.pop(context);
+              onPressed: () async{
+                CreateGroupRequestModel model = CreateGroupRequestModel(
+                    groupId: groupIdController.text,
+                    groupName: groupNameController.text);
+                int response = await APIService.doPostInsert(
+                    context: context,
+                    data: model.toJson(),
+                    path: "/admin/group/create-group");
+                if(response == 201 && mounted) {
+                  context.pop();
+                }
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -143,8 +157,8 @@ class _GroupPageState extends State<GroupPage> {
     _fetchGroups();
   }
 
-  _navigateToEditGroup(GroupResponseModel group) async {
-    GroupResponseModel? updatedGroup = await Navigator.push(
+  _navigateToEditGroup(GroupListResponseModel group) async {
+    /*GroupListResponseModel? updatedGroup = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddGroup(
@@ -158,15 +172,16 @@ class _GroupPageState extends State<GroupPage> {
 
     if (updatedGroup != null) {
       setState(() {
-        int index = groups.indexWhere((g) => g.groupNumber == updatedGroup.groupNumber);
+        int index =
+            groups1.indexWhere((g) => g.groupNumber == updatedGroup.groupNumber);
         if (index != -1) {
-          groups[index] = updatedGroup;
+          groups1[index] = updatedGroup;
         }
       });
-    }
+    }*/
   }
 
-  _showDeleteConfirmationDialog(GroupResponseModel group) {
+  _showDeleteConfirmationDialog(GroupListResponseModel group) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -193,28 +208,28 @@ class _GroupPageState extends State<GroupPage> {
     );
   }
 
-  _deleteGroup(GroupResponseModel group) {
-    int groupNumber = group.groupNumber ?? 1;
+  _deleteGroup(GroupListResponseModel group) {
+    String groupID = group.iD;
 
-    APIService.doDelete(path: "/admin/delete-group", query: {"groupNumber": groupNumber.toString()})
-        .then((value) {
+    APIService.doDelete(
+        path: "/admin/delete-group",
+        query: {"groupID": groupID.toString()}).then((value) {
       if (value == "Success") {
         setState(() {
-          groups.remove(group);
+          groups1.remove(group);
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Group $groupNumber deleted successfully'),
+          content: Text('Group $groupID deleted successfully'),
         ));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Failed to delete group $groupNumber'),
+          content: Text('Failed to delete group $groupID'),
         ));
       }
     }).catchError((error) {
-
       print('Error deleting group: $error');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to delete group $groupNumber'),
+        content: Text('Failed to delete group $groupID'),
       ));
     });
   }
@@ -246,11 +261,12 @@ class _GroupPageState extends State<GroupPage> {
       );
     } else {
       setState(() {
-        int index = groups.indexWhere((g) => g.groupNumber == group.groupNumber);
+        int index =
+            groups1.indexWhere((g) => g.groupNumber == group.groupNumber);
         if (index != -1) {
-          groups[index] = group;
+          groups1[index] = group;
         } else {
-          groups.add(group);
+          groups1.add(group);
         }
       });
 
@@ -275,5 +291,4 @@ class _GroupPageState extends State<GroupPage> {
       );
     }
   }
-
 }

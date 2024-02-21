@@ -5,6 +5,8 @@ import 'package:ui/models/event/current_day_event_response_model.dart';
 import 'package:ui/services/api_service.dart';
 import 'package:ui/services/shared_service.dart';
 
+import '../services/background.dart';
+
 class AttendancePage extends StatefulWidget {
   const AttendancePage({super.key});
 
@@ -86,12 +88,8 @@ class _AttendancePageState extends State<AttendancePage> {
               SharedService.eventId = selectedEvent!;
               SharedService.eventEndTime = findEndTimeByEventId(
                   currentDayEventResponseModel, selectedEvent!)!;
-              Map<String, dynamic> data = {
-                "sap": SharedService.sapId,
-                "event_id": SharedService.eventId,
-                "event_end_time": SharedService.eventEndTime,
-              };
-              FlutterBackgroundService().invoke("setData", data);
+              SharedService.prefs.setString("eventEndTime", SharedService.eventEndTime.toString());
+              SharedService.prefs.setString("eventId", SharedService.eventId);
               context.pushNamed('verify-user');
             }
           : null,

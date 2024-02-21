@@ -13,7 +13,7 @@ class LocationService {
 
   static List<LatLng> coordinates = [];
 
-  static Future<void> getPosition() async {
+  static Future<void> getPosition(String sapId, String eventId) async {
     try {
       Position position = await getCurrentPosition();
       coordinates.add(LatLng(position.latitude, position.longitude));
@@ -22,13 +22,13 @@ class LocationService {
         print('Error in background task: $e');
       }
     } finally{
-      if (SharedService.sapId != "" && coordinates.isNotEmpty) {
+      if (sapId != "" && coordinates.isNotEmpty) {
         LocationRequestModel location = LocationRequestModel(
-            sapId: SharedService.sapId, eventID: SharedService.eventId);
+            sapId: sapId, eventID: eventId);
         location.dateTime = DateTime.now();
         location.coordinates = coordinates;
         print(location.toJson());
-        int response = await APIService.doPostInsert(data: location.toJson(), path: "/user-current-location", context: null);
+        int response = await APIService.doPostInsert(data: location.toJson(), path: "/user/user-current-location", context: null);
         if(response == 201){
           coordinates = [];
         }

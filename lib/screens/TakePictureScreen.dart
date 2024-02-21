@@ -7,6 +7,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/services/api_service.dart';
 
+import '../services/shared_service.dart';
+
 
 // A screen that allows users to take a picture using a given camera.
 class TakePictureScreen extends StatefulWidget {
@@ -88,7 +90,20 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             if (!mounted) return;
             int response = await APIService.doMultipartPost(path: "/user/event/verify-user", image: image);
             if(response == 200){
+
+
+
+
               FlutterBackgroundService().startService();
+
+              Map<String, dynamic> data = {
+                "sap": SharedService.sapId,
+                "event_id": SharedService.eventId,
+                "event_end_time": SharedService.eventEndTime,
+              };
+              FlutterBackgroundService().invoke("setData", data);
+              print("sent data");
+
             }
             // If the picture was taken, display it on a new screen.
             if(mounted){

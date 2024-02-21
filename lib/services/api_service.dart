@@ -116,6 +116,9 @@ class APIService {
       required XFile image}) async {
     Uri url = Uri.http(Constants.baseUri, "/api$path/${SharedService.sapId}");
     var request = http.MultipartRequest('POST', url);
+    LoginResponseModel? loginData = await SharedService.getLoginDetails();
+
+    request.headers['Authorization'] = 'Bearer ${loginData!.accessToken}';
 
     Position position = await LocationService.getCurrentPosition();
     String coordinates = "${position.latitude} ${position.longitude}";

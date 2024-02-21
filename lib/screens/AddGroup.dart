@@ -95,7 +95,7 @@ class _AddGroupState extends State<AddGroup> {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'Students:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
