@@ -5,7 +5,7 @@ import 'package:ui/screens/AddGroup.dart';
 import 'package:ui/services/api_service.dart';
 
 class GroupPage extends StatefulWidget {
-  const GroupPage({Key? key}) : super(key: key);
+  const GroupPage({super.key});
 
   @override
   _GroupPageState createState() => _GroupPageState();
@@ -102,17 +102,17 @@ class _GroupPageState extends State<GroupPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Group'),
+          title: const Text('Add Group'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: groupIdController,
-                decoration: InputDecoration(labelText: 'Group ID'),
+                decoration: const InputDecoration(labelText: 'Group ID'),
               ),
               TextField(
                 controller: groupNameController,
-                decoration: InputDecoration(labelText: 'Group Name'),
+                decoration: const InputDecoration(labelText: 'Group Name'),
               ),
             ],
           ),
@@ -121,7 +121,7 @@ class _GroupPageState extends State<GroupPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
@@ -133,7 +133,7 @@ class _GroupPageState extends State<GroupPage> {
                 _saveGroup(newGroup);
                 Navigator.pop(context);
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );

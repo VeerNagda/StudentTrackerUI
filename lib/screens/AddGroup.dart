@@ -11,7 +11,7 @@ class AddGroup extends StatefulWidget {
   final Function(GroupResponseModel) onSaveGroup;
   final GroupResponseModel? initialGroup;
 
-  const AddGroup({Key? key, required this.onSaveGroup, this.initialGroup}) : super(key: key);
+  const AddGroup({super.key, required this.onSaveGroup, this.initialGroup});
 
   @override
   _AddGroupState createState() => _AddGroupState();
@@ -95,7 +95,7 @@ class _AddGroupState extends State<AddGroup> {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'Students:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
@@ -120,7 +120,7 @@ class _AddGroupState extends State<AddGroup> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.remove_circle),
+                      icon: const Icon(Icons.remove_circle),
                       onPressed: () {
                         _removeStudent(index);
                       },

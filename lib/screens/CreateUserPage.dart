@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'AddSingleUser.dart';
+import 'package:file_picker/file_picker.dart';
 
 class CreateUserPage extends StatelessWidget {
-  const CreateUserPage({Key? key}) : super(key: key);
+  const CreateUserPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class CreateUserPage extends StatelessWidget {
                   DataColumn(label: Text('Roll No')),
                   DataColumn(label: Text('Role')),
                 ],
-                rows: [
+                rows: const [
                   // TODO: Add rows dynamically
                   DataRow(cells: [
                     DataCell(Text('45207210001')),
@@ -53,21 +54,22 @@ class CreateUserPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ListTile(
-                    leading: Icon(Icons.person_add),
-                    title: Text('Add Single User'),
+                    leading: const Icon(Icons.person_add),
+                    title: const Text('Add Single User'),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddSingleUserPage(),
+                          builder: (context) => const AddSingleUserPage(),
                         ),
                       );
                     },
                   ),
                   ListTile(
-                    leading: Icon(Icons.people_alt),
-                    title: Text('Add Bulk Users'),
+                    //icon for many peops
+                    leading: const Icon(Icons.people_alt),
+                    title: const Text('Add Bulk Users'),
                     onTap: () {
                       Navigator.pop(context);
                       _showAddBulkUsersDialog(context);
@@ -85,30 +87,57 @@ class CreateUserPage extends StatelessWidget {
   }
 
   //pop up wala part for bulk user
-  void _showAddBulkUsersDialog(BuildContext context) {
 
+
+  void _showAddBulkUsersDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Excel File'),
-          content: Text('Still need to do that excel wala part'), // You can customize the content as needed
+          title: const Text('Add CSV File'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Select a CSV file to add users in bulk.'),
+              ElevatedButton(
+                onPressed: () async {
+                  FilePickerResult? result = await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: ['csv'],
+                  );
+
+                  if(result != null) {
+                    PlatformFile file = result.files.first;
+                    print(file.name);
+                    print(file.bytes);
+                    print(file.size);
+                    print(file.extension);
+                    print(file.path);
+                  } else {
+                  }
+                },
+                child: const Text('Select CSV File'),
+              ),
+            ],
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
+                // TODO Handle the CSV file and add users
                 Navigator.pop(context);
               },
-              child: Text('Add'),
+              child: const Text('Add'),
             ),
           ],
         );
       },
     );
   }
+
 }
