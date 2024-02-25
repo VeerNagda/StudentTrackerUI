@@ -4,6 +4,7 @@ import 'package:ui/screens/VenuePage.dart';
 
 import '../services/shared_service.dart';
 import 'EventsPage.dart';
+import 'ReportAttendance.dart';
 import 'UserGroup.dart';
 
 void main() {
@@ -51,8 +52,8 @@ class AdminHomePage extends StatelessWidget {
           children: [
             EventsPage(),
             VenuesPage(),
-            StudentGroup(), //not created student group page yet
-            VenuesPage(), // not created attendance page yet
+            StudentGroup(),
+            ReportAttendance(),
           ],
         ),
       ),
