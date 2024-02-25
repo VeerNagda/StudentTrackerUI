@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:ui/models/event/event_response_model.dart';
 
 class EventFormResult {
@@ -99,78 +100,32 @@ class _EventFormState extends State<EventForm> {
   }
 
   Widget _buildDateRangeSelectionButton(String label, DateTime? startDate, DateTime? endDate) {
-    TimeOfDay? startTime;
-    TimeOfDay? endTime;
-
     return ElevatedButton(
       onPressed: () async {
-        DateTime? pickedStartDate = await showDatePicker(
+        final initialStartDate = startDate ?? DateTime.now();
+        final initialEndDate = endDate ?? initialStartDate;
+
+        DateTimeRange? pickedDateRange = await showDateRangePicker(
           context: context,
-          initialDate: startDate ?? DateTime.now(),
-          firstDate: DateTime.now(),
-          lastDate: DateTime(2080),
+          firstDate: DateTime(1900),
+          lastDate: DateTime(2100),
+          initialDateRange: DateTimeRange(start: initialStartDate, end: initialEndDate),
         );
 
-        if (pickedStartDate != null) {
-          startTime = await showTimePicker(
-            context: context,
-            initialTime: TimeOfDay.now(),
-          );
-
-          if (startTime != null) {
-            DateTime? pickedEndDate = await showDatePicker(
-              context: context,
-              initialDate: endDate ?? pickedStartDate,
-              firstDate: pickedStartDate,
-              lastDate: DateTime(2080),
-            );
-
-            if (pickedEndDate != null) {
-              endTime = await showTimePicker(
-                context: context,
-                initialTime: TimeOfDay.now(),
-              );
-
-              if (endTime != null) {
-                setState(() {
-                  startDate = DateTime(
-                    pickedStartDate.year,
-                    pickedStartDate.month,
-                    pickedStartDate.day,
-                    startTime!.hour,
-                    startTime!.minute,
-                  );
-
-                  endDate = DateTime(
-                    pickedEndDate.year,
-                    pickedEndDate.month,
-                    pickedEndDate.day,
-                    endTime!.hour,
-                    endTime!.minute,
-                  );
-                });
-              }
-            }
-          }
+        if (pickedDateRange != null) {
+          setState(() {
+            startDate = pickedDateRange.start;
+            endDate = pickedDateRange.end;
+          });
         }
       },
-      child: Text('$label: ${_formatDateTime(startDate)} ${_formatTime(startTime)} - ${_formatDateTime(endDate)} ${_formatTime(endTime)}'),
+      child: Text('$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
     );
   }
 
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime != null) {
-      return dateTime.toLocal().toString();
-    } else {
-      return '';
-    }
-  }
-
-  String _formatTime(TimeOfDay? time) {
-    if (time != null) {
-      final hours = time.hour.toString().padLeft(2, '0');
-      final minutes = time.minute.toString().padLeft(2, '0');
-      return '$hours:$minutes';
+      return DateFormat.yMMMMd().add_jm().format(dateTime);
     } else {
       return '';
     }
@@ -196,7 +151,7 @@ class _EventFormState extends State<EventForm> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Select Venue'),
+              title: const Text('Select Venue'),
               content: StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
                   return Column(
@@ -221,7 +176,7 @@ class _EventFormState extends State<EventForm> {
                           );
                         },
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -231,13 +186,13 @@ class _EventFormState extends State<EventForm> {
                                 selectedVenues.clear(); // Clear all selected venues
                               });
                             },
-                            child: Text('Clear All'),
+                            child: const Text('Clear All'),
                           ),
                           ElevatedButton(
                             onPressed: () {
                               Navigator.pop(context, selectedVenues);
                             },
-                            child: Text('Save'),
+                            child: const Text('Save'),
                           ),
                         ],
                       ),
@@ -257,8 +212,6 @@ class _EventFormState extends State<EventForm> {
       child: const Text('Select Venue'),
     );
   }
-
-
 
   void _saveEvent() {
     if (eventIdController.text.isEmpty || eventNameController.text.isEmpty) {

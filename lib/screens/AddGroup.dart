@@ -11,7 +11,7 @@ class AddGroup extends StatefulWidget {
   final Function(GroupResponseModel)? onSaveGroup;
   final GroupResponseModel? initialGroup;
 
-  const AddGroup({Key? key, this.initialGroup, this.onSaveGroup}) : super(key: key);
+  const AddGroup({super.key, this.initialGroup, this.onSaveGroup});
 
   @override
   _AddGroupState createState() => _AddGroupState();
@@ -56,7 +56,7 @@ class _AddGroupState extends State<AddGroup> {
 
   void _saveGroup() {
     GroupResponseModel newGroup = GroupResponseModel(
-      groupNumber: int.tryParse(groupNumberController.text) ?? null, // Parse group number from text
+      groupNumber: int.tryParse(groupNumberController.text), // Parse group number from text
       members: studentNames,
       name: nameController.text,
     );

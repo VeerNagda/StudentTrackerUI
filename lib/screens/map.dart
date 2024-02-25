@@ -17,7 +17,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({Key? key}) : super(key: key);
+  const MapScreen({super.key});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -196,10 +196,10 @@ class _MapScreenState extends State<MapScreen> {
                   children: [
                     FloatingActionButton(
                       onPressed: _clearSelectedPoints,
-                      child: const Text("Clear"),
                       tooltip: 'Clear Selected Points',
+                      child: const Text("Clear"),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     FloatingActionButton(
                       onPressed: () async {
                         _polyPoints.add(_polyPoints[0]);
@@ -208,7 +208,7 @@ class _MapScreenState extends State<MapScreen> {
                       },
                       child: const Text("Save"),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     FloatingActionButton(
                       onPressed: _getUserLocation,
                       child: const Icon(Icons.navigation),
@@ -278,7 +278,7 @@ class _MapScreenState extends State<MapScreen> {
         child: Row(
           children: [
             IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.pop(context);
               },

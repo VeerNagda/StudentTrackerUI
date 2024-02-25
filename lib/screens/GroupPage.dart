@@ -326,12 +326,6 @@ class _GroupPageState extends State<GroupPage> {
   }
 
 
-
-
-
-
-
-
   _showDeleteConfirmationDialog(GroupListResponseModel group) {
     showDialog(
       context: context,

@@ -1,16 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:ui/screens/AddGroup.dart';
-import 'package:ui/screens/AddSingleUser.dart';
 import 'package:ui/screens/AdminHomePage.dart';
 import 'package:ui/screens/HomePage.dart';
 import 'package:ui/screens/TakePictureScreen.dart';
-import 'package:ui/screens/VenuePage.dart';
 import 'package:ui/screens/event_form.dart';
 import 'package:ui/screens/login_page.dart';
 import 'package:ui/screens/map.dart';
 import 'package:ui/services/shared_service.dart';
 
-import '../models/StudentGroup/group_response_model.dart';
 
 // Import your screen widgets
 
