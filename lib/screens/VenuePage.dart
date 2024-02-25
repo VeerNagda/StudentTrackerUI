@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../models/venue/venue_response_model.dart';
 import '../services/api_service.dart';
-import 'AddVenuePage.dart';
 
 class VenuesPage extends StatefulWidget {
   const VenuesPage({super.key});
@@ -34,12 +34,11 @@ class _VenuesPageState extends State<VenuesPage> {
     });
   }
 
+
   void _navigateToAddVenue() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => AddVenuePage(onSaveVenue: _handleAddVenue)),
-    );
+    context.goNamed('add-venue');
   }
+
 
   void _handleAddVenue(VenueResponseModel newVenue) {
     setState(() {
@@ -107,12 +106,7 @@ class _VenuesPageState extends State<VenuesPage> {
   }
 
   void _navigateToEditVenue(VenueResponseModel venue) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddVenuePage(initialVenue: venue, onSaveVenue: _handleEditVenue),
-      ),
-    );
+    context.goNamed('add-venue');
   }
 
   void _handleEditVenue(VenueResponseModel editedVenue) {

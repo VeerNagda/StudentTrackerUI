@@ -4,11 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:ui/models/StudentGroup/create_group_request_model.dart';
 import 'package:ui/models/StudentGroup/group_list_response_model.dart';
 import 'package:ui/models/StudentGroup/group_response_model.dart';
-import 'package:ui/screens/AddGroup.dart';
 import 'package:ui/services/api_service.dart';
+import 'package:file_picker/file_picker.dart';
 
 class GroupPage extends StatefulWidget {
-  const GroupPage({super.key});
+  const GroupPage({Key? key});
 
   @override
   _GroupPageState createState() => _GroupPageState();
@@ -19,7 +19,6 @@ class _GroupPageState extends State<GroupPage> {
   late List<GroupListResponseModel> groups = [];
 
 
-
   @override
   void initState() {
     super.initState();
@@ -27,19 +26,16 @@ class _GroupPageState extends State<GroupPage> {
   }
 
   void _fetchGroups() {
-
-
-    APIService.doGet(path: "/admin/group/all-groups").then((value) => {
-      if (value != "")
-        {
-          setState(() {
-            groups = jsonDecode(value)
-                .map<GroupListResponseModel>(
-                    (item) => GroupListResponseModel.fromJson(item))
-                .toList();
-          }),
-          print(groups)
-        }
+    APIService.doGet(path: "/admin/group/all-groups").then((value) {
+      if (value != "") {
+        setState(() {
+          groups = jsonDecode(value)
+              .map<GroupListResponseModel>(
+                  (item) => GroupListResponseModel.fromJson(item))
+              .toList();
+        });
+        print(groups);
+      }
     });
   }
 
@@ -54,46 +50,56 @@ class _GroupPageState extends State<GroupPage> {
         padding: const EdgeInsets.all(8.0),
         child: groups.isEmpty
             ? const Center(
-                child: Text(
-                  'No groups yet. Tap the + button to add a group.',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              )
+          child: Text(
+            'No groups yet. Tap the + button to add a group.',
+            style: TextStyle(fontSize: 16.0),
+          ),
+        )
             : ListView.builder(
-                itemCount: groups.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    elevation: 5,
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    child: ListTile(
-                      title: Text('Group ${groups[index].name}'),
-                      subtitle:
-                          Text('Members: ${groups[index].numMembers}'),
-                      onTap: () {
-                        _navigateToGroupDetails(groups1[index]);
-                      },
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              _navigateToEditGroup(groups[index]);
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              _showDeleteConfirmationDialog(groups[index]);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+          itemCount: groups.length,
+          itemBuilder: (context, index) {
+            return Card(
+              elevation: 5,
+              margin:
+              const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: ListTile(
+                title: Text('Group ${groups[index].name}'),
+                subtitle:
+                Text('Members: ${groups[index].numMembers}'),
+                onTap: () {
+                  _navigateToGroupDetails(groups1[index]);
                 },
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.person_add),
+                      onPressed: () {
+                        _navigateToAddStudents(groups[index]);
+                      },
+                      tooltip: 'Add Students',
+                    ),
+
+
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        _navigateToEditGroup(groups[index]);
+                      },
+                    ),
+
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        _showDeleteConfirmationDialog(groups[index]);
+                      },
+                    ),
+                  ],
+                ),
               ),
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -135,7 +141,7 @@ class _GroupPageState extends State<GroupPage> {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () async{
+              onPressed: () async {
                 CreateGroupRequestModel model = CreateGroupRequestModel(
                     groupId: groupIdController.text,
                     groupName: groupNameController.text);
@@ -143,8 +149,9 @@ class _GroupPageState extends State<GroupPage> {
                     context: context,
                     data: model.toJson(),
                     path: "/admin/group/create-group");
-                if(response == 201 && mounted) {
-                  context.pop();
+                if (response == 201 && mounted) {
+                  Navigator.pop(context);
+                  _fetchGroups();
                 }
               },
               child: const Text('Save'),
@@ -153,33 +160,180 @@ class _GroupPageState extends State<GroupPage> {
         );
       },
     );
-
-    _fetchGroups();
   }
 
   _navigateToEditGroup(GroupListResponseModel group) async {
-    /*GroupListResponseModel? updatedGroup = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddGroup(
-          onSaveGroup: (GroupResponseModel updatedGroup) {
-            return updatedGroup;
-          },
-          initialGroup: group,
-        ),
-      ),
-    );
+    TextEditingController groupIdController = TextEditingController();
+    TextEditingController groupNameController = TextEditingController();
 
-    if (updatedGroup != null) {
-      setState(() {
-        int index =
-            groups1.indexWhere((g) => g.groupNumber == updatedGroup.groupNumber);
-        if (index != -1) {
-          groups1[index] = updatedGroup;
-        }
-      });
-    }*/
+    groupIdController.text = group.iD;
+    groupNameController.text = group.name;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Group'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: groupIdController,
+                decoration: const InputDecoration(labelText: 'Group ID'),
+              ),
+              TextField(
+                controller: groupNameController,
+                decoration: const InputDecoration(labelText: 'Group Name'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                group.iD = groupIdController.text;
+                group.name = groupNameController.text;
+
+                setState(() {
+                  int index = groups.indexWhere((g) => g.iD == group.iD);
+                  if (index != -1) {
+                    groups[index] = group;
+                  }
+                });
+
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
   }
+
+  //for students
+
+  _navigateToAddStudents(GroupListResponseModel group) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController sapIdController = TextEditingController();
+        int _selectedValue = 0; // To track the selected option
+
+        return AlertDialog(
+          title: const Text('Add Students'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Row(
+                        children: [
+                          Radio<int>(
+                            value: 0,
+                            groupValue: _selectedValue,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedValue = value!;
+                              });
+                            },
+                          ),
+                          const Text('Single'),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Radio<int>(
+                            value: 1,
+                            groupValue: _selectedValue,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedValue = value!;
+                              });
+                            },
+                          ),
+                          const Text('Multiple'),
+                        ],
+                      ),
+                    ],
+                  ),
+                  if (_selectedValue == 0) // Show SAP ID input only if "Single Student" is selected
+                    TextField(
+                      controller: sapIdController,
+                      decoration: InputDecoration(labelText: 'SAP ID'),
+                      keyboardType: TextInputType.number,
+                    ),
+                  if (_selectedValue == 1) // Show a button to select a CSV file only if "Multiple Students" is selected
+                    ElevatedButton(
+                      onPressed: () async {
+                        FilePickerResult? result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['csv'],
+                        );
+
+                        if (result != null) {
+                          PlatformFile file = result.files.first;
+                          print(file.name);
+                          print(file.bytes);
+                          print(file.size);
+                          print(file.extension);
+                          print(file.path);
+
+                          // Now you can use this file to add multiple students
+                          // Implement this according to your needs
+                        } else {
+                          // User canceled the picker
+                        }
+                      },
+                      child: const Text('Select CSV File'),
+                    ),
+                ],
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                if (_selectedValue == 0) {
+                  // Save single student with SAP ID
+                  String sapId = sapIdController.text;
+                  _saveSingleStudent(sapId);
+                }
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _saveSingleStudent(String sapId) {
+    // Add your logic here to save the single student with the provided SAP ID
+    // You can use the SAP ID to make API calls or perform any other operations
+  }
+
+
+
+
+
+
+
 
   _showDeleteConfirmationDialog(GroupListResponseModel group) {
     showDialog(
@@ -213,7 +367,8 @@ class _GroupPageState extends State<GroupPage> {
 
     APIService.doDelete(
         path: "/admin/delete-group",
-        query: {"groupID": groupID.toString()}).then((value) {
+        query: {"groupID": groupID.toString()})
+        .then((value) {
       if (value == "Success") {
         setState(() {
           groups1.remove(group);
@@ -262,7 +417,7 @@ class _GroupPageState extends State<GroupPage> {
     } else {
       setState(() {
         int index =
-            groups1.indexWhere((g) => g.groupNumber == group.groupNumber);
+        groups1.indexWhere((g) => g.groupNumber == group.groupNumber);
         if (index != -1) {
           groups1[index] = group;
         } else {

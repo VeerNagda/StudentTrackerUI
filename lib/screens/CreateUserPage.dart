@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'AddSingleUser.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -46,7 +47,7 @@ class CreateUserPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Show modal bottom sheet with options
+
           showModalBottomSheet(
             context: context,
             builder: (BuildContext context) {
@@ -57,13 +58,9 @@ class CreateUserPage extends StatelessWidget {
                     leading: const Icon(Icons.person_add),
                     title: const Text('Add Single User'),
                     onTap: () {
+                      //TODO dont know how to pop using go-routes
                       Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AddSingleUserPage(),
-                        ),
-                      );
+                      context.goNamed('single-user');
                     },
                   ),
                   ListTile(

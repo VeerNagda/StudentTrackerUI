@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 enum UserRole { Admin, Student }
 
 class AddSingleUserPage extends StatefulWidget {
-  const AddSingleUserPage({Key? key});
+  const AddSingleUserPage({super.key });
 
   @override
   _AddSingleUserPageState createState() => _AddSingleUserPageState();
@@ -31,6 +31,7 @@ class _AddSingleUserPageState extends State<AddSingleUserPage> {
             TextField(
               controller: sapIdController,
               decoration: const InputDecoration(labelText: 'SAP ID'),
+              keyboardType: TextInputType.number,
             ),
             TextField(
               controller: firstNameController,
@@ -52,9 +53,9 @@ class _AddSingleUserPageState extends State<AddSingleUserPage> {
                   selectedRole = value;
                 });
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Role',
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(),
               ),
               items: UserRole.values.map((UserRole role) {
                 return DropdownMenuItem<UserRole>(

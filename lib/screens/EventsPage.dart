@@ -105,7 +105,6 @@ class _EventsPageState extends State<EventsPage> {
       context,
       MaterialPageRoute(builder: (context) => const EventForm()),
     );
-
     if (result.event != null) {
       setState(() {
         events.add(result.event!);
@@ -120,6 +119,7 @@ class _EventsPageState extends State<EventsPage> {
         builder: (context) => EventForm(initialEvent: event),
       ),
     );
+
 
     if (result.event != null) {
       setState(() {

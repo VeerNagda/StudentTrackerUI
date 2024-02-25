@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ui/models/event/event_response_model.dart';
-import 'VenueSelectionScreen.dart';
-
 
 class EventFormResult {
   final EventResponseModel? event;
@@ -12,17 +10,25 @@ class EventFormResult {
 class EventForm extends StatefulWidget {
   final EventResponseModel? initialEvent; // Add initialEvent named parameter
 
-  const EventForm({super.key, this.initialEvent});
+  const EventForm({Key? key, this.initialEvent}) : super(key: key);
 
   @override
   _EventFormState createState() => _EventFormState();
 }
+
 class _EventFormState extends State<EventForm> {
   late TextEditingController eventIdController;
   late TextEditingController eventNameController;
   DateTime? startDate;
   DateTime? endDate;
   List<Venue> selectedVenues = [];
+
+  // for venue pop up
+  List<Venue> venues = [
+    Venue(venueID: '1', venueName: 'Venue 1'),
+    Venue(venueID: '2', venueName: 'Venue 2'),
+    Venue(venueID: '3', venueName: 'Venue 3'),
+  ];
 
   @override
   void initState() {
@@ -37,12 +43,11 @@ class _EventFormState extends State<EventForm> {
     // event id is disabled
     if (widget.initialEvent != null) {
       eventIdController.text = widget.initialEvent!.eventID;
-      eventIdController.text = widget.initialEvent!.eventID;
+      eventNameController.text = widget.initialEvent!.eventName;
       eventIdController.selection = TextSelection.fromPosition(TextPosition(offset: eventIdController.text.length));
       eventIdController.addListener(() {});
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +80,7 @@ class _EventFormState extends State<EventForm> {
       ),
     );
   }
+
   Widget _buildTextFormField(String label, TextEditingController controller, bool enabled) {
     return TextFormField(
       controller: controller,
@@ -91,7 +97,7 @@ class _EventFormState extends State<EventForm> {
       },
     );
   }
-  //for date time
+
   Widget _buildDateRangeSelectionButton(String label, DateTime? startDate, DateTime? endDate) {
     TimeOfDay? startTime;
     TimeOfDay? endTime;
@@ -152,7 +158,6 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-  //string representing date
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime != null) {
       return dateTime.toLocal().toString();
@@ -161,8 +166,6 @@ class _EventFormState extends State<EventForm> {
     }
   }
 
-  //string representing time
-  // padLeft to ensure that both the hour and minute components are represented with two digits each
   String _formatTime(TimeOfDay? time) {
     if (time != null) {
       final hours = time.hour.toString().padLeft(2, '0');
@@ -172,7 +175,6 @@ class _EventFormState extends State<EventForm> {
       return '';
     }
   }
-
 
   Widget _buildSelectedVenuesText() {
     return Text('Selected Venues: ${selectedVenues.length}');
@@ -190,20 +192,75 @@ class _EventFormState extends State<EventForm> {
   Widget _buildVenueSelectionButton() {
     return ElevatedButton(
       onPressed: () async {
-        List<Venue> selectedVenuesResult = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const VenueSelectionScreen()),
+        List<Venue>? selectedVenuesResult = await showDialog<List<Venue>>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Select Venue'),
+              content: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ...List.generate(
+                        venues.length,
+                            (index) {
+                          final venue = venues[index];
+                          return CheckboxListTile(
+                            title: Text(venue.venueName),
+                            value: selectedVenues.contains(venue),
+                            onChanged: (bool? value) {
+                              setState(() {
+                                if (value != null && value) {
+                                  selectedVenues.add(venue);
+                                } else {
+                                  selectedVenues.remove(venue);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ),
+                      SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedVenues.clear(); // Clear all selected venues
+                              });
+                            },
+                            child: Text('Clear All'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context, selectedVenues);
+                            },
+                            child: Text('Save'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
         );
-        setState(() {
-          selectedVenues = selectedVenuesResult;
-        });
+        if (selectedVenuesResult != null) {
+          setState(() {
+            selectedVenues = selectedVenuesResult;
+          });
+        }
       },
       child: const Text('Select Venue'),
     );
   }
 
+
+
   void _saveEvent() {
-    //validation
     if (eventIdController.text.isEmpty || eventNameController.text.isEmpty) {
       return;
     }
@@ -213,7 +270,7 @@ class _EventFormState extends State<EventForm> {
       eventName: eventNameController.text,
       startDate: startDate,
       endDate: endDate,
-      venue: [],
+      venue: selectedVenues,
     );
 
     Navigator.pop(context, EventFormResult(event: newEvent));

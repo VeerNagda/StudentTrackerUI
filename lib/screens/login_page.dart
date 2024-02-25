@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/models/login/login_request_model.dart';
 import 'package:ui/services/api_service.dart';
-
 import 'PasswordChangePage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -153,7 +152,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: TextButton(
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
-                            // Check SAP ID length and navigate accordingly
                             setState(() {
                               isAPICallProcess = true;
                             });

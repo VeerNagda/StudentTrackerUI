@@ -8,10 +8,10 @@ class GroupResult {
 }
 
 class AddGroup extends StatefulWidget {
-  final Function(GroupResponseModel) onSaveGroup;
+  final Function(GroupResponseModel)? onSaveGroup;
   final GroupResponseModel? initialGroup;
 
-  const AddGroup({super.key, required this.onSaveGroup, this.initialGroup});
+  const AddGroup({Key? key, this.initialGroup, this.onSaveGroup}) : super(key: key);
 
   @override
   _AddGroupState createState() => _AddGroupState();
@@ -32,7 +32,7 @@ class _AddGroupState extends State<AddGroup> {
     group = widget.initialGroup ?? GroupResponseModel(groupNumber: null, members: [], name: '');
     studentNames.addAll(group.members);
     nameController.text = group.name;
-    initialValue: group.groupNumber != null ? group.groupNumber.toString() : '';
+    groupNumberController.text = group.groupNumber != null ? group.groupNumber.toString() : ''; // Set text for group number controller
   }
 
   @override
@@ -56,12 +56,15 @@ class _AddGroupState extends State<AddGroup> {
 
   void _saveGroup() {
     GroupResponseModel newGroup = GroupResponseModel(
-      groupNumber: int.parse(groupNumberController.text), // Parse group number from text
+      groupNumber: int.tryParse(groupNumberController.text) ?? null, // Parse group number from text
       members: studentNames,
       name: nameController.text,
     );
 
-    widget.onSaveGroup(newGroup);
+    if (widget.onSaveGroup != null) {
+      widget.onSaveGroup!(newGroup);
+    }
+
     Navigator.pop(context);
     Navigator.pop(context, GroupResult(group: newGroup));
   }
@@ -82,7 +85,9 @@ class _AddGroupState extends State<AddGroup> {
               child: TextFormField(
                 controller: groupNumberController,
                 decoration: const InputDecoration(labelText: 'Group ID'),
-                keyboardType: TextInputType.number, // Set keyboard type to number
+
+                //changed keyboard type to number
+                keyboardType: TextInputType.number,
               ),
             ),
 

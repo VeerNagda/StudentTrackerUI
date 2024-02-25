@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
@@ -7,7 +6,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:ui/services/api_service.dart';
 
 class Selfie extends StatefulWidget {
-  const Selfie({Key? key}) : super(key: key);
+  const Selfie({super.key});
 
   @override
   _SelfieState createState() => _SelfieState();
