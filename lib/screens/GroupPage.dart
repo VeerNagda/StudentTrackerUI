@@ -287,10 +287,8 @@ class _GroupPageState extends State<GroupPage> {
                           print(file.extension);
                           print(file.path);
 
-                          // Now you can use this file to add multiple students
-                          // Implement this according to your needs
                         } else {
-                          // User canceled the picker
+
                         }
                       },
                       child: const Text('Select CSV File'),
