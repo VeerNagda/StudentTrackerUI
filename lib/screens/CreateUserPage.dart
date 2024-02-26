@@ -1,9 +1,27 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'AddSingleUser.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:ui/models/user/user_response_model.dart';
+import 'package:ui/services/api_service.dart';
 
-class CreateUserPage extends StatelessWidget {
-  const CreateUserPage({super.key});
+class CreateUserPage extends StatefulWidget {
+  const CreateUserPage({Key? key}) : super(key: key);
+
+  @override
+  _CreateUserPageState createState() => _CreateUserPageState();
+}
+
+class _CreateUserPageState extends State<CreateUserPage> {
+  late List<UserResponseModel> users = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAllUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,26 +37,32 @@ class CreateUserPage extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: const [
-                  DataColumn(label: Text('SAP ID')),
-                  DataColumn(label: Text('First Name')),
-                  DataColumn(label: Text('Last Name')),
-                  DataColumn(label: Text('Roll No')),
-                  DataColumn(label: Text('Role')),
-                ],
-                rows: const [
-                  // TODO: Add rows dynamically
-                  DataRow(cells: [
-                    DataCell(Text('45207210001')),
-                    DataCell(Text('Parinaz')),
-                    DataCell(Text('Bharucha')),
-                    DataCell(Text('A004')),
-                    DataCell(Text('Student')),
-                  ]),
-                ],
+            SingleChildScrollView( //TODO pari implement this https://stackoverflow.com/a/70689232
+              scrollDirection: Axis.vertical,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: const [
+                    DataColumn(label: Text('SAP ID')),
+                    DataColumn(label: Text('First Name')),
+                    DataColumn(label: Text('Last Name')),
+                    DataColumn(label: Text('Roll No')),
+                    DataColumn(label: Text('Phone No')),
+                    DataColumn(label: Text('Email ID')),
+                    DataColumn(label: Text('Role')),
+                  ],
+                  rows: users.map((user) {
+                    return DataRow(cells: [
+                      DataCell(Text(user.iD)),
+                      DataCell(Text(user.fName)),
+                      DataCell(Text(user.lName)),
+                      DataCell(Text(user.rollNo)),
+                      DataCell(Text(user.phone)),
+                      DataCell(Text(user.email)),
+                      DataCell(Text(user.role.toString())),
+                    ]);
+                  }).toList(),
+                ),
               ),
             ),
           ],
@@ -97,12 +121,13 @@ class CreateUserPage extends StatelessWidget {
               const Text('Select a CSV file to add users in bulk.'),
               ElevatedButton(
                 onPressed: () async {
-                  FilePickerResult? result = await FilePicker.platform.pickFiles(
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowedExtensions: ['csv'],
                   );
 
-                  if(result != null) {
+                  if (result != null) {
                     PlatformFile file = result.files.first;
                     print(file.name);
                     print(file.bytes);
@@ -136,4 +161,21 @@ class CreateUserPage extends StatelessWidget {
     );
   }
 
+  void _fetchAllUsers() {
+    APIService.doGet(path: "/admin/user/all-users").then(
+      (value) => {
+        if (value != "")
+          {
+            setState(
+              () {
+                users = jsonDecode(value)
+                    .map<UserResponseModel>(
+                        (item) => UserResponseModel.fromJson(item))
+                    .toList();
+              },
+            )
+          }
+      },
+    );
+  }
 }

@@ -300,18 +300,18 @@ class _GroupPageState extends State<GroupPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.pop();
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
                 if (_selectedValue == 0) {
                   // Save single student with SAP ID
                   String sapId = sapIdController.text;
-                  _saveSingleStudent(sapId);
+                  _saveSingleStudent(sapId, group);
                 }
+                //context.pop();
               },
               child: const Text('OK'),
             ),
@@ -321,8 +321,17 @@ class _GroupPageState extends State<GroupPage> {
     );
   }
 
-  void _saveSingleStudent(String sapId) {
-    //TODO
+  Future<void> _saveSingleStudent(String sapId, GroupListResponseModel group) async {
+    Map<String, dynamic> data = {
+        "group_id": group.iD,
+        "user_id": sapId
+    };
+    int response = await APIService.doPostInsert(context: context, data: data, path: "/admin/group/assign-student");
+    if(response == 201 && mounted) {
+      context.pop();
+    } else{
+      print(response);
+    }
   }
 
 

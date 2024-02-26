@@ -1,23 +1,35 @@
 import 'dart:convert';
 
-VenueResponseModel venueResponseJson(String str) =>
+import 'package:latlong2/latlong.dart';
+
+VenueResponseModel loginResponseJson(String str) =>
     VenueResponseModel.fromJson(jsonDecode(str));
 
 class VenueResponseModel {
-  late String venueID;
-  late String venueName;
+  final String id;
+  final String name;
+  final List<List<LatLng>> coordinates;
 
-  VenueResponseModel({required this.venueID, required this.venueName});
+  VenueResponseModel({
+    required this.id,
+    required this.name,
+    required this.coordinates,
+  });
 
-  VenueResponseModel.fromJson(Map<String, dynamic> json) {
-    venueID = json['Venue_ID'];
-    venueName = json['Venue_Name'];
-  }
+  factory VenueResponseModel.fromJson(Map<String, dynamic> json) {
+    List<List<LatLng>> parsedCoordinates = [];
+    for (var coordsList in json['Coordinates']) {
+      List<LatLng> latLngList = [];
+      for (var coords in coordsList) {
+        latLngList.add(LatLng(coords['y'], coords['x']));
+      }
+      parsedCoordinates.add(latLngList);
+    }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['Venue_ID'] = venueID;
-    data['Venue_Name'] = venueName;
-    return data;
+    return VenueResponseModel(
+      id: json['ID'],
+      name: json['Name'],
+      coordinates: parsedCoordinates,
+    );
   }
 }

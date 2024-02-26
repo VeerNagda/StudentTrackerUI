@@ -23,11 +23,12 @@ class _VenuesPageState extends State<VenuesPage> {
   }
 
   void _fetchVenues() {
-    APIService.doGet(path: "/admin/get-venues").then((value) {
+    APIService.doGet(path: "/admin/venue/all-venues").then((value) {
       if (value != "") {
         setState(() {
-          venues = (jsonDecode(value) as List)
-              .map((item) => VenueResponseModel.fromJson(item))
+          venues = jsonDecode(value)
+              .map<VenueResponseModel>(
+                  (item) => VenueResponseModel.fromJson(item))
               .toList();
         });
       }
@@ -69,7 +70,7 @@ class _VenuesPageState extends State<VenuesPage> {
               margin: const EdgeInsets.symmetric(
                   vertical: 8, horizontal: 16),
               child: ListTile(
-                title: Text(venues[index].venueName),
+                title: Text(venues[index].name),
                 onTap: () {
                   _navigateToVenueDetails(venues[index]);
                 },
@@ -111,7 +112,7 @@ class _VenuesPageState extends State<VenuesPage> {
 
   void _handleEditVenue(VenueResponseModel editedVenue) {
     setState(() {
-      final index = venues.indexWhere((venue) => venue.venueID == editedVenue.venueID);
+      final index = venues.indexWhere((venue) => venue.id == editedVenue.id);
       if (index != -1) {
         venues[index] = editedVenue;
       }
@@ -147,7 +148,7 @@ class _VenuesPageState extends State<VenuesPage> {
 
   void _deleteVenue(VenueResponseModel venue) {
     Map<String, String> query = {
-      "venueId": venue.venueID
+      "venueId": venue.id
     };
     APIService.doDelete(path: "/admin/delete-venue", query: query).then((value) {
       if (value == "Success") {
@@ -160,7 +161,7 @@ class _VenuesPageState extends State<VenuesPage> {
 
   _navigateToVenueDetails(VenueResponseModel selectedEvent) {
     print('Selected Venue Details:');
-    print('Venue ID: ${selectedEvent.venueID}');
-    print('Venue Name: ${selectedEvent.venueName}');
+    print('Venue ID: ${selectedEvent.id}');
+    print('Venue Name: ${selectedEvent.id}');
   }
 }
