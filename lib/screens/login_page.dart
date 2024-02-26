@@ -72,7 +72,9 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: 'Enter your SAP ID',
                         prefixIcon: Icon(Icons.person_outline),
                         border: OutlineInputBorder(),
+
                       ),
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                   _gap(),

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For formatting date
+// For formatting date
 
 class ReportAttendance extends StatelessWidget {
   final List<ReportAttendance>? events; // Making events nullable
 
-  const ReportAttendance({Key? key, this.events}) : super(key: key); // Making events nullable
+  const ReportAttendance({super.key, this.events}); // Making events nullable
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Attendance Report'),
+        title: const Text('Attendance Report'),
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -59,7 +59,7 @@ class ReportAttendance extends StatelessWidget {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: ReportAttendance(),
   ));
 }

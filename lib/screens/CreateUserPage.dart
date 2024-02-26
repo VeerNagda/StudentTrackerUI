@@ -28,49 +28,50 @@ class _CreateUserPageState extends State<CreateUserPage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            const Text(
-              'Users:',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            SingleChildScrollView( //TODO pari implement this https://stackoverflow.com/a/70689232
-              scrollDirection: Axis.vertical,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('SAP ID')),
-                    DataColumn(label: Text('First Name')),
-                    DataColumn(label: Text('Last Name')),
-                    DataColumn(label: Text('Roll No')),
-                    DataColumn(label: Text('Phone No')),
-                    DataColumn(label: Text('Email ID')),
-                    DataColumn(label: Text('Role')),
-                  ],
-                  rows: users.map((user) {
-                    return DataRow(cells: [
-                      DataCell(Text(user.iD)),
-                      DataCell(Text(user.fName)),
-                      DataCell(Text(user.lName)),
-                      DataCell(Text(user.rollNo)),
-                      DataCell(Text(user.phone)),
-                      DataCell(Text(user.email)),
-                      DataCell(Text(user.role.toString())),
-                    ]);
-                  }).toList(),
+        child: SingleChildScrollView( // Wrap the Column widget with SingleChildScrollView
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                'Users:',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('SAP ID')),
+                      DataColumn(label: Text('First Name')),
+                      DataColumn(label: Text('Last Name')),
+                      DataColumn(label: Text('Roll No')),
+                      DataColumn(label: Text('Phone No')),
+                      DataColumn(label: Text('Email ID')),
+                      DataColumn(label: Text('Role')),
+                    ],
+                    rows: users.map((user) {
+                      return DataRow(cells: [
+                        DataCell(Text(user.iD)),
+                        DataCell(Text(user.fName)),
+                        DataCell(Text(user.lName)),
+                        DataCell(Text(user.rollNo)),
+                        DataCell(Text(user.phone)),
+                        DataCell(Text(user.email)),
+                        DataCell(Text(user.role.toString())),
+                      ]);
+                    }).toList(),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-
           showModalBottomSheet(
             context: context,
             builder: (BuildContext context) {
@@ -81,13 +82,11 @@ class _CreateUserPageState extends State<CreateUserPage> {
                     leading: const Icon(Icons.person_add),
                     title: const Text('Add Single User'),
                     onTap: () {
-                      //TODO dont know how to pop using go-routes
                       Navigator.pop(context);
                       context.goNamed('single-user');
                     },
                   ),
                   ListTile(
-                    //icon for many peops
                     leading: const Icon(Icons.people_alt),
                     title: const Text('Add Bulk Users'),
                     onTap: () {
@@ -106,7 +105,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
     );
   }
 
-  //pop up wala part for bulk user
+
+
+//pop up wala part for bulk user
 
 
   void _showAddBulkUsersDialog(BuildContext context) {

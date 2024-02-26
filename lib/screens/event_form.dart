@@ -11,7 +11,7 @@ class EventFormResult {
 class EventForm extends StatefulWidget {
   final EventResponseModel? initialEvent; // Add initialEvent named parameter
 
-  const EventForm({Key? key, this.initialEvent}) : super(key: key);
+  const EventForm({super.key, this.initialEvent});
 
   @override
   _EventFormState createState() => _EventFormState();

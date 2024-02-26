@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ui/models/StudentGroup/create_group_request_model.dart';
 import 'package:ui/models/StudentGroup/group_list_response_model.dart';
 import 'package:ui/models/StudentGroup/group_response_model.dart';
@@ -8,7 +7,7 @@ import 'package:ui/services/api_service.dart';
 import 'package:file_picker/file_picker.dart';
 
 class GroupPage extends StatefulWidget {
-  const GroupPage({Key? key});
+  const GroupPage({super.key});
 
   @override
   _GroupPageState createState() => _GroupPageState();
@@ -223,7 +222,7 @@ class _GroupPageState extends State<GroupPage> {
       context: context,
       builder: (BuildContext context) {
         TextEditingController sapIdController = TextEditingController();
-        int _selectedValue = 0; // To track the selected option
+        int selectedValue = 0; // To track the selected option
 
         return AlertDialog(
           title: const Text('Add Students'),
@@ -239,10 +238,10 @@ class _GroupPageState extends State<GroupPage> {
                         children: [
                           Radio<int>(
                             value: 0,
-                            groupValue: _selectedValue,
+                            groupValue: selectedValue,
                             onChanged: (value) {
                               setState(() {
-                                _selectedValue = value!;
+                                selectedValue = value!;
                               });
                             },
                           ),
@@ -253,10 +252,10 @@ class _GroupPageState extends State<GroupPage> {
                         children: [
                           Radio<int>(
                             value: 1,
-                            groupValue: _selectedValue,
+                            groupValue: selectedValue,
                             onChanged: (value) {
                               setState(() {
-                                _selectedValue = value!;
+                                selectedValue = value!;
                               });
                             },
                           ),
@@ -265,13 +264,13 @@ class _GroupPageState extends State<GroupPage> {
                       ),
                     ],
                   ),
-                  if (_selectedValue == 0) // Show SAP ID input only if "Single Student" is selected
+                  if (selectedValue == 0) // Show SAP ID input only if "Single Student" is selected
                     TextField(
                       controller: sapIdController,
-                      decoration: InputDecoration(labelText: 'SAP ID'),
+                      decoration: const InputDecoration(labelText: 'SAP ID'),
                       keyboardType: TextInputType.number,
                     ),
-                  if (_selectedValue == 1) // Show a button to select a CSV file only if "Multiple Students" is selected
+                  if (selectedValue == 1) // Show a button to select a CSV file only if "Multiple Students" is selected
                     ElevatedButton(
                       onPressed: () async {
                         FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -300,13 +299,15 @@ class _GroupPageState extends State<GroupPage> {
           actions: [
             TextButton(
               onPressed: () {
-                context.pop();
+                //context.pop();
+
+                Navigator.pop(context);
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                if (_selectedValue == 0) {
+                if (selectedValue == 0) {
                   // Save single student with SAP ID
                   String sapId = sapIdController.text;
                   _saveSingleStudent(sapId, group);
@@ -328,7 +329,10 @@ class _GroupPageState extends State<GroupPage> {
     };
     int response = await APIService.doPostInsert(context: context, data: data, path: "/admin/group/assign-student");
     if(response == 201 && mounted) {
-      context.pop();
+      // was giving error so changed it
+     //  context.pop();
+
+      Navigator.pop(context);
     } else{
       print(response);
     }
