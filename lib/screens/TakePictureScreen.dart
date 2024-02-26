@@ -88,7 +88,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             final image = await _controller.takePicture();
 
             if (!mounted) return;
-            int response = await APIService.doMultipartPost(path: "/user/event/verify-user", image: image);
+            int response = await APIService.doMultipartImagePost(path: "/user/event/verify-user", image: image);
             if(response == 200){
 
 

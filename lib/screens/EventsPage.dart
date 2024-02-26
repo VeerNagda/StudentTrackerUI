@@ -157,11 +157,8 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   _deleteEvent(EventResponseModel event) {
-    Map<String, String> query = {
-      "eventId": event.eventID
-    };
-    APIService.doDelete(path: "/admin/delete-event", query: query).then((value) => {
-      if (value == "Success")
+    APIService.doDelete(path: "/admin/delete-event", param: event.eventID).then((value) => {
+      if (value == 204)
         {
           setState(() {
             events.remove(event);

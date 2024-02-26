@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui/models/StudentGroup/create_group_request_model.dart';
 import 'package:ui/models/StudentGroup/group_list_response_model.dart';
-import 'package:ui/models/StudentGroup/group_response_model.dart';
 import 'package:ui/services/api_service.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -14,9 +16,8 @@ class GroupPage extends StatefulWidget {
 }
 
 class _GroupPageState extends State<GroupPage> {
-  late List<GroupResponseModel> groups1 = [];
-  late List<GroupListResponseModel> groups = [];
 
+  late List<GroupListResponseModel> groups = [];
 
   @override
   void initState() {
@@ -33,7 +34,6 @@ class _GroupPageState extends State<GroupPage> {
                   (item) => GroupListResponseModel.fromJson(item))
               .toList();
         });
-        print(groups);
       }
     });
   }
@@ -49,56 +49,52 @@ class _GroupPageState extends State<GroupPage> {
         padding: const EdgeInsets.all(8.0),
         child: groups.isEmpty
             ? const Center(
-          child: Text(
-            'No groups yet. Tap the + button to add a group.',
-            style: TextStyle(fontSize: 16.0),
-          ),
-        )
-            : ListView.builder(
-          itemCount: groups.length,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 5,
-              margin:
-              const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: ListTile(
-                title: Text('Group ${groups[index].name}'),
-                subtitle:
-                Text('Members: ${groups[index].numMembers}'),
-                onTap: () {
-                  _navigateToGroupDetails(groups1[index]);
-                },
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.person_add),
-                      onPressed: () {
-                        _navigateToAddStudents(groups[index]);
-                      },
-                      tooltip: 'Add Students',
-                    ),
-
-
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        _navigateToEditGroup(groups[index]);
-                      },
-                    ),
-
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(groups[index]);
-                      },
-                    ),
-                  ],
+                child: Text(
+                  'No groups yet. Tap the + button to add a group.',
+                  style: TextStyle(fontSize: 16.0),
                 ),
+              )
+            : ListView.builder(
+                itemCount: groups.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 5,
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListTile(
+                      title: Text('Group ${groups[index].name}'),
+                      subtitle: Text('Members: ${groups[index].numMembers}'),
+                      onTap: () {
+                        _navigateToGroupDetails(groups[index]);
+                      },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.person_add),
+                            onPressed: () {
+                              _navigateToAddStudents(groups[index]);
+                            },
+                            tooltip: 'Add Students',
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              _navigateToEditGroup(groups[index]);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              _showDeleteConfirmationDialog(groups[index]);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -179,6 +175,7 @@ class _GroupPageState extends State<GroupPage> {
               TextField(
                 controller: groupIdController,
                 decoration: const InputDecoration(labelText: 'Group ID'),
+                readOnly: true,
               ),
               TextField(
                 controller: groupNameController,
@@ -195,17 +192,7 @@ class _GroupPageState extends State<GroupPage> {
             ),
             TextButton(
               onPressed: () async {
-                group.iD = groupIdController.text;
-                group.name = groupNameController.text;
-
-                setState(() {
-                  int index = groups.indexWhere((g) => g.iD == group.iD);
-                  if (index != -1) {
-                    groups[index] = group;
-                  }
-                });
-
-                Navigator.pop(context);
+                _updateGroup(group, groupNameController.text);
               },
               child: const Text('Save'),
             ),
@@ -215,6 +202,19 @@ class _GroupPageState extends State<GroupPage> {
     );
   }
 
+  _updateGroup(GroupListResponseModel group, String newGroupName) async {
+    Map<String, dynamic> data = {"newName" : newGroupName};
+    int response = await APIService.doPut(context: context, data: data, path: "/admin/group/update-group", param: group.iD);
+
+    setState(() {
+      _fetchGroups();
+    });
+    if(response == 200 && mounted){
+      context.pop();
+    }
+
+  }
+
   //for students
 
   _navigateToAddStudents(GroupListResponseModel group) {
@@ -222,6 +222,8 @@ class _GroupPageState extends State<GroupPage> {
       context: context,
       builder: (BuildContext context) {
         TextEditingController sapIdController = TextEditingController();
+
+        Uint8List? uploadFileData;
         int selectedValue = 0; // To track the selected option
 
         return AlertDialog(
@@ -264,30 +266,32 @@ class _GroupPageState extends State<GroupPage> {
                       ),
                     ],
                   ),
-                  if (selectedValue == 0) // Show SAP ID input only if "Single Student" is selected
+                  if (selectedValue ==
+                      0) // Show SAP ID input only if "Single Student" is selected
                     TextField(
                       controller: sapIdController,
                       decoration: const InputDecoration(labelText: 'SAP ID'),
                       keyboardType: TextInputType.number,
                     ),
-                  if (selectedValue == 1) // Show a button to select a CSV file only if "Multiple Students" is selected
+                  if (selectedValue ==
+                      1) // Show a button to select a CSV file only if "Multiple Students" is selected
                     ElevatedButton(
                       onPressed: () async {
-                        FilePickerResult? result = await FilePicker.platform.pickFiles(
+                        FilePickerResult? result =
+                            await FilePicker.platform.pickFiles(
                           type: FileType.custom,
                           allowedExtensions: ['csv'],
                         );
-
                         if (result != null) {
-                          PlatformFile file = result.files.first;
-                          print(file.name);
-                          print(file.bytes);
-                          print(file.size);
-                          print(file.extension);
-                          print(file.path);
-
+                          if(kIsWeb){
+                            uploadFileData = result.files.single.bytes;
+                          }
+                          else{
+                            File? file = File(result.files.single.path!);
+                            uploadFileData = file.readAsBytesSync();
+                          }
                         } else {
-
+                          // User canceled the picker
                         }
                       },
                       child: const Text('Select CSV File'),
@@ -299,9 +303,7 @@ class _GroupPageState extends State<GroupPage> {
           actions: [
             TextButton(
               onPressed: () {
-                //context.pop();
-
-                Navigator.pop(context);
+                context.pop();
               },
               child: const Text('Cancel'),
             ),
@@ -312,7 +314,11 @@ class _GroupPageState extends State<GroupPage> {
                   String sapId = sapIdController.text;
                   _saveSingleStudent(sapId, group);
                 }
-                //context.pop();
+                if (selectedValue == 1) {
+                  if(kIsWeb) {
+                    _saveMultipleStudents(uploadFileData!, group);
+                  }
+                }
               },
               child: const Text('OK'),
             ),
@@ -322,22 +328,33 @@ class _GroupPageState extends State<GroupPage> {
     );
   }
 
-  Future<void> _saveSingleStudent(String sapId, GroupListResponseModel group) async {
-    Map<String, dynamic> data = {
-        "group_id": group.iD,
-        "user_id": sapId
-    };
-    int response = await APIService.doPostInsert(context: context, data: data, path: "/admin/group/assign-student");
-    if(response == 201 && mounted) {
-      // was giving error so changed it
-     //  context.pop();
-
-      Navigator.pop(context);
-    } else{
-      print(response);
+  Future<void> _saveSingleStudent(
+      String sapId, GroupListResponseModel group) async {
+    Map<String, dynamic> data = {"group_id": group.iD, "user_id": sapId};
+    int response = await APIService.doPostInsert(
+        context: context, data: data, path: "/admin/group/assign-student");
+    if (response == 201 && mounted) {
+      context.pop();
+    } else {
+      if (kDebugMode) {
+        print(response);
+      }
     }
   }
 
+  Future<void> _saveMultipleStudents(
+      Uint8List file, GroupListResponseModel group) async {
+    String groupId = group.iD;
+    int response = await APIService.doMultipartCsvPost(
+        path: "/admin/group/assign-multiple-user/$groupId", fileBytes: file, fileName: 'assign-multiple-user');
+    if (response == 200 && mounted) {
+      context.pop();
+    } else {
+      if (kDebugMode) {
+        print(response);
+      }
+    }
+  }
 
   _showDeleteConfirmationDialog(GroupListResponseModel group) {
     showDialog(
@@ -370,12 +387,10 @@ class _GroupPageState extends State<GroupPage> {
     String groupID = group.iD;
 
     APIService.doDelete(
-        path: "/admin/delete-group",
-        query: {"groupID": groupID.toString()})
-        .then((value) {
-      if (value == "Success") {
+        path: "/admin/group/delete-group", param: groupID).then((value) {
+      if (value == 204) {
         setState(() {
-          groups1.remove(group);
+          _fetchGroups();
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Group $groupID deleted successfully'),
@@ -386,19 +401,22 @@ class _GroupPageState extends State<GroupPage> {
         ));
       }
     }).catchError((error) {
-      print('Error deleting group: $error');
+      if (kDebugMode) {
+        print('Error deleting group: $error');
+      }
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Failed to delete group $groupID'),
       ));
     });
   }
 
-  _navigateToGroupDetails(GroupResponseModel selectedGroup) {
+  _navigateToGroupDetails(GroupListResponseModel selectedGroup) {
     print('Selected Group Details:');
-    print('Group Number: ${selectedGroup.groupNumber}');
-    print('Number of Members: ${selectedGroup.members.length}');
+    print('Group Number: ${selectedGroup.iD}');
+    print('Number of Members: ${selectedGroup.numMembers}');
   }
 
+/*
   _saveGroup(GroupResponseModel group) {
     if (group.groupNumber == 0 || group.members.isEmpty) {
       showDialog(
@@ -421,7 +439,7 @@ class _GroupPageState extends State<GroupPage> {
     } else {
       setState(() {
         int index =
-        groups1.indexWhere((g) => g.groupNumber == group.groupNumber);
+            groups1.indexWhere((g) => g.groupNumber == group.groupNumber);
         if (index != -1) {
           groups1[index] = group;
         } else {
@@ -450,4 +468,5 @@ class _GroupPageState extends State<GroupPage> {
       );
     }
   }
+*/
 }

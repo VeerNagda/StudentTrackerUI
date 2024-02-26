@@ -66,13 +66,44 @@ class APIService {
     }
   }
 
+
+  static Future<int> doPut(
+      {required BuildContext? context,
+      required Map<String, dynamic> data,
+      required String path, required String param}) async {
+    LoginResponseModel? loginData = await SharedService.getLoginDetails();
+
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${loginData!.accessToken}',
+    };
+    var url = Uri.http(Constants.baseUri, "/api$path/$param");
+    try {
+      var response = await client.put(url,
+          headers: requestHeaders, body: jsonEncode(data));
+      MessageModel messageModel = messageResponseJson(response.body);
+      if (context != null) {
+        toast(status: response.statusCode, message: messageModel.message);
+      }
+      return response.statusCode;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return -1;
+    }
+  }
+
   static Future<String> doGet(
-      {required String path, Map<String, String>? query}) async {
+      {required String path, Map<String, String>? query, bool inValidateCache=false}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${loginData!.accessToken}',
     };
+    if(inValidateCache){
+      requestHeaders['Cache-Control'] = 'no-cache';
+    }
     Uri url;
     if (query == null) {
       url = Uri.http(Constants.baseUri, "/api$path", query);
@@ -86,34 +117,24 @@ class APIService {
     return "";
   }
 
-  static Future<String> doDelete(
-      {required String path, Map<String, String>? query}) async {
+  static Future<int> doDelete(
+      {required String path, required String param}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${loginData!.accessToken}',
     };
 
-    Uri url;
-    if (query == null) {
-      url = Uri.http(Constants.baseUri, "/api$path");
-    } else {
-      url = Uri.http(Constants.baseUri, "/api$path", query);
-    }
+    Uri url = Uri.http(Constants.baseUri, "/api$path/$param");
+
 
     var response = await http.delete(url, headers: requestHeaders);
 
-    if (response.statusCode == 204) {
-      // Assuming 204 is returned for successful delete
-      return "Success"; // You can return any appropriate message or indicator
-    } else {
-      return "Failed"; // You can return any appropriate message or indicator
-    }
+    return response.statusCode;
   }
 
-  static Future<int> doMultipartPost(
-      {required String path,
-      required XFile image}) async {
+  static Future<int> doMultipartImagePost(
+      {required String path, required XFile image}) async {
     Uri url = Uri.http(Constants.baseUri, "/api$path/${SharedService.sapId}");
     var request = http.MultipartRequest('POST', url);
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
@@ -131,14 +152,53 @@ class APIService {
     request.fields['location'] = coordinates;
     request.fields['eventId'] = SharedService.eventId;
 
-
     var response = await http.Response.fromStream(await request.send());
     if (response.statusCode == 200) {
-      print('Image uploaded successfully!');
-      print('Response: ${response.body}');
+      if (kDebugMode) {
+        print('Image uploaded successfully!');
+        print('Response: ${response.body}');
+      }
     } else {
-      print('Failed to upload image. Error: ${response.reasonPhrase}');
+      if (kDebugMode) {
+        print('Failed to upload image. Error: ${response.reasonPhrase}');
+      }
     }
     return response.statusCode;
   }
+
+  static Future<int> doMultipartCsvPost({
+    required String path,
+    required Uint8List fileBytes,
+    required String fileName,
+  }) async {
+    Uri url = Uri.http(Constants.baseUri, "/api$path");
+    var request = http.MultipartRequest('POST', url);
+    LoginResponseModel? loginData = await SharedService.getLoginDetails();
+
+    request.headers['Authorization'] = 'Bearer ${loginData!.accessToken}';
+
+    var fileStream = http.ByteStream(Stream.fromIterable([fileBytes]));
+    var length = fileBytes.length;
+    var multipartFile = http.MultipartFile(
+      'csv_file',
+      fileStream,
+      length,
+      filename: fileName,
+    );
+    request.files.add(multipartFile);
+
+    var response = await http.Response.fromStream(await request.send());
+    if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print('CSV file uploaded successfully!');
+        print('Response: ${response.body}');
+      }
+    } else {
+      if (kDebugMode) {
+        print('Failed to upload CSV file. Error: ${response.reasonPhrase}');
+      }
+    }
+    return response.statusCode;
+  }
+
 }
