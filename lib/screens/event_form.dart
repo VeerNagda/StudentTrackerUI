@@ -11,7 +11,7 @@ class EventFormResult {
 class EventForm extends StatefulWidget {
   final EventResponseModel? initialEvent; // Add initialEvent named parameter
 
-  const EventForm({super.key, this.initialEvent});
+  const EventForm({Key? key, this.initialEvent}) : super(key: key);
 
   @override
   _EventFormState createState() => _EventFormState();
@@ -29,6 +29,14 @@ class _EventFormState extends State<EventForm> {
     Venue(venueID: '1', venueName: 'Venue 1'),
     Venue(venueID: '2', venueName: 'Venue 2'),
     Venue(venueID: '3', venueName: 'Venue 3'),
+    Venue(venueID: '4', venueName: 'Venue 4'),
+    Venue(venueID: '5', venueName: 'Venue 5'),
+    Venue(venueID: '6', venueName: 'Venue 6'),
+    Venue(venueID: '7', venueName: 'Venue 7'),
+    Venue(venueID: '8', venueName: 'Venue 8'),
+    Venue(venueID: '9', venueName: 'Venue 9'),
+    Venue(venueID: '4', venueName: 'Venue 4'),
+
   ];
 
   @override
@@ -37,8 +45,8 @@ class _EventFormState extends State<EventForm> {
 
     eventIdController = TextEditingController(text: widget.initialEvent?.eventID ?? '');
     eventNameController = TextEditingController(text: widget.initialEvent?.eventName ?? '');
-    startDate = widget.initialEvent?.startDate;
-    endDate = widget.initialEvent?.endDate;
+    startDate = widget.initialEvent?.startDate ;
+    endDate = widget.initialEvent?.endDate ;
     selectedVenues = widget.initialEvent?.venue ?? [];
 
     // event id is disabled
@@ -68,7 +76,7 @@ class _EventFormState extends State<EventForm> {
               const SizedBox(height: 12),
               _buildTextFormField('Event Name', eventNameController, true), // Enable for both editing and creating
               const SizedBox(height: 12),
-              _buildDateRangeSelectionButton('Start Date and End Date ', startDate, endDate),
+              _buildDateRangeSelectionButton('Start Date and End Date '),
               const SizedBox(height: 12),
               _buildVenueSelectionButton(),
               const SizedBox(height: 12),
@@ -99,70 +107,76 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-  Widget _buildDateRangeSelectionButton(String label, DateTime? startDate, DateTime? endDate) {
-    return ElevatedButton(
-      onPressed: () async {
-        final initialStartDate = startDate ?? DateTime.now();
-        final initialEndDate = endDate ?? initialStartDate;
+  Widget _buildDateRangeSelectionButton(String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ElevatedButton(
+          onPressed: () async {
+            final initialStartDate = startDate ?? DateTime.now();
+            final initialEndDate = endDate ?? initialStartDate;
 
-        DateTime? pickedStartDate = await showDatePicker(
-          context: context,
-          initialDate: initialStartDate,
-          firstDate: DateTime(2024),
-          lastDate: DateTime(2100),
-        );
-
-        if (pickedStartDate != null) {
-          TimeOfDay? pickedStartTime = await showTimePicker(
-            context: context,
-            initialTime: TimeOfDay.fromDateTime(pickedStartDate),
-          );
-
-          if (pickedStartTime != null) {
-            DateTime? pickedEndDate = await showDatePicker(
+            DateTime? pickedStartDate = await showDatePicker(
               context: context,
-              initialDate: initialEndDate,
+              initialDate: initialStartDate,
               firstDate: DateTime(2024),
               lastDate: DateTime(2100),
             );
 
-            if (pickedEndDate != null) {
-              TimeOfDay? pickedEndTime = await showTimePicker(
+            if (pickedStartDate != null) {
+              TimeOfDay? pickedStartTime = await showTimePicker(
                 context: context,
-                initialTime: TimeOfDay.fromDateTime(pickedEndDate),
+                initialTime: TimeOfDay.fromDateTime(pickedStartDate),
               );
 
-              if (pickedEndTime != null) {
-                setState(() {
-                  startDate = DateTime(
-                    pickedStartDate.year,
-                    pickedStartDate.month,
-                    pickedStartDate.day,
-                    pickedStartTime.hour,
-                    pickedStartTime.minute,
+              if (pickedStartTime != null) {
+                DateTime? pickedEndDate = await showDatePicker(
+                  context: context,
+                  initialDate: initialEndDate,
+                  firstDate: DateTime(2024),
+                  lastDate: DateTime(2100),
+                );
+
+                if (pickedEndDate != null) {
+                  TimeOfDay? pickedEndTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.fromDateTime(pickedEndDate),
                   );
-                  endDate = DateTime(
-                    pickedEndDate.year,
-                    pickedEndDate.month,
-                    pickedEndDate.day,
-                    pickedEndTime.hour,
-                    pickedEndTime.minute,
-                  );
-                });
+
+                  if (pickedEndTime != null) {
+                    setState(() {
+                      startDate = DateTime(
+                        pickedStartDate.year,
+                        pickedStartDate.month,
+                        pickedStartDate.day,
+                        pickedStartTime.hour,
+                        pickedStartTime.minute,
+                      );
+                      endDate = DateTime(
+                        pickedEndDate.year,
+                        pickedEndDate.month,
+                        pickedEndDate.day,
+                        pickedEndTime.hour,
+                        pickedEndTime.minute,
+                      );
+                    });
+                  }
+                }
               }
             }
-          }
-        }
-      },
-      child: Text('$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
+          },
+          child: Text('$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
+        ),
+      ],
     );
   }
+
 
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime != null) {
       return DateFormat.yMMMMd().add_jm().format(dateTime);
     } else {
-      return '';
+      return 'Not set';
     }
   }
 
@@ -192,25 +206,34 @@ class _EventFormState extends State<EventForm> {
                 builder: (BuildContext context, StateSetter setState) {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      ...List.generate(
-                        venues.length,
-                            (index) {
-                          final venue = venues[index];
-                          return CheckboxListTile(
-                            title: Text(venue.venueName),
-                            value: selectedVenues.contains(venue),
-                            onChanged: (bool? value) {
-                              setState(() {
-                                if (value != null && value) {
-                                  selectedVenues.add(venue);
-                                } else {
-                                  selectedVenues.remove(venue);
-                                }
-                              });
-                            },
-                          );
-                        },
+                      SizedBox(
+                        height: 200, // Adjust the height according to your requirement
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(
+                              venues.length,
+                                  (index) {
+                                final venue = venues[index];
+                                return CheckboxListTile(
+                                  title: Text(venue.venueName),
+                                  value: selectedVenues.contains(venue),
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      if (value != null && value) {
+                                        selectedVenues.add(venue);
+                                      } else {
+                                        selectedVenues.remove(venue);
+                                      }
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -248,6 +271,9 @@ class _EventFormState extends State<EventForm> {
       child: const Text('Select Venue'),
     );
   }
+
+
+
 
   void _saveEvent() {
     if (eventIdController.text.isEmpty || eventNameController.text.isEmpty) {

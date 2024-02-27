@@ -135,7 +135,7 @@ class _VenuesPageState extends State<VenuesPage> {
             ),
             TextButton(
               onPressed: () {
-                _deleteVenue(venue);
+               // _deleteVenue(venue);
                 Navigator.pop(context);
               },
               child: const Text('Delete'),
@@ -146,7 +146,7 @@ class _VenuesPageState extends State<VenuesPage> {
     );
   }
 
-  void _deleteVenue(VenueResponseModel venue) {
+  /*void _deleteVenue(VenueResponseModel venue) {
     Map<String, String> query = {
       "venueId": venue.id
     };
@@ -157,7 +157,7 @@ class _VenuesPageState extends State<VenuesPage> {
         });
       }
     });
-  }
+  }*/
 
   _navigateToVenueDetails(VenueResponseModel selectedEvent) {
     print('Selected Venue Details:');
