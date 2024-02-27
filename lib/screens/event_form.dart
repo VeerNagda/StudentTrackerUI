@@ -105,18 +105,53 @@ class _EventFormState extends State<EventForm> {
         final initialStartDate = startDate ?? DateTime.now();
         final initialEndDate = endDate ?? initialStartDate;
 
-        DateTimeRange? pickedDateRange = await showDateRangePicker(
+        DateTime? pickedStartDate = await showDatePicker(
           context: context,
-          firstDate: DateTime(1900),
+          initialDate: initialStartDate,
+          firstDate: DateTime(2024),
           lastDate: DateTime(2100),
-          initialDateRange: DateTimeRange(start: initialStartDate, end: initialEndDate),
         );
 
-        if (pickedDateRange != null) {
-          setState(() {
-            startDate = pickedDateRange.start;
-            endDate = pickedDateRange.end;
-          });
+        if (pickedStartDate != null) {
+          TimeOfDay? pickedStartTime = await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.fromDateTime(pickedStartDate),
+          );
+
+          if (pickedStartTime != null) {
+            DateTime? pickedEndDate = await showDatePicker(
+              context: context,
+              initialDate: initialEndDate,
+              firstDate: DateTime(2024),
+              lastDate: DateTime(2100),
+            );
+
+            if (pickedEndDate != null) {
+              TimeOfDay? pickedEndTime = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(pickedEndDate),
+              );
+
+              if (pickedEndTime != null) {
+                setState(() {
+                  startDate = DateTime(
+                    pickedStartDate.year,
+                    pickedStartDate.month,
+                    pickedStartDate.day,
+                    pickedStartTime.hour,
+                    pickedStartTime.minute,
+                  );
+                  endDate = DateTime(
+                    pickedEndDate.year,
+                    pickedEndDate.month,
+                    pickedEndDate.day,
+                    pickedEndTime.hour,
+                    pickedEndTime.minute,
+                  );
+                });
+              }
+            }
+          }
         }
       },
       child: Text('$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
@@ -130,6 +165,7 @@ class _EventFormState extends State<EventForm> {
       return '';
     }
   }
+
 
   Widget _buildSelectedVenuesText() {
     return Text('Selected Venues: ${selectedVenues.length}');
