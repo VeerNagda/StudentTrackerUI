@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-// For formatting date
+import 'package:go_router/go_router.dart';
 
 class ReportAttendance extends StatelessWidget {
-  final List<ReportAttendance>? events; // Making events nullable
+  final List<ReportAttendance>? events;
 
-  const ReportAttendance({super.key, this.events}); // Making events nullable
+  const ReportAttendance({Key? key, this.events}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +47,10 @@ class ReportAttendance extends StatelessWidget {
                 DataCell(Text('123')),
                 DataCell(Text('YOLO')),
                 DataCell(Text('31st ')),
-                DataCell(Icon(Icons.download)),
+                DataCell(DownloadButton()),
               ],
             ),
-
+            // Add more rows as needed
           ],
         ),
       ),
@@ -58,8 +58,43 @@ class ReportAttendance extends StatelessWidget {
   }
 }
 
-void main() {
-  runApp(const MaterialApp(
-    home: ReportAttendance(),
-  ));
+class DownloadButton extends StatelessWidget {
+  const DownloadButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.download),
+      onPressed: () {
+        _showConfirmationDialog(context);
+      },
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Download Confirmation"),
+          content: const Text("Are you sure you want to download this file?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Perform download action here
+                context.pop();
+              },
+              child: const Text("Yes"),
+            ),
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text("No"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

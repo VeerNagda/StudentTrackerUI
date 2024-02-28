@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 
 class PasswordChangePage extends StatelessWidget {
-  const PasswordChangePage({Key? key}) : super(key: key);
+  const PasswordChangePage({super.key});
 
 
   @override

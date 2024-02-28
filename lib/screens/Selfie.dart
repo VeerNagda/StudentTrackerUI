@@ -1,12 +1,14 @@
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui/services/api_service.dart';
 
 class Selfie extends StatefulWidget {
-  const Selfie({super.key});
+  const Selfie({Key? key}) : super(key: key);
 
   @override
   _SelfieState createState() => _SelfieState();
@@ -27,17 +29,18 @@ class _SelfieState extends State<Selfie> {
 
   void initCamera() async {
     final cameras = await availableCameras();
-    camera = cameras.firstWhere((camera) => camera.lensDirection == CameraLensDirection.front, orElse: () => cameras.first);
-
+    final frontCamera = cameras.firstWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.front,
+      orElse: () => cameras.first,
+    );
+    camera = frontCamera;
     _controller = CameraController(
       camera!,
       ResolutionPreset.medium,
     );
-
     setState(() {});
     _initializeControllerFuture = _controller.initialize();
   }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -47,7 +50,7 @@ class _SelfieState extends State<Selfie> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Take and Display Selfie')),
+      appBar: AppBar(title: const Text('Profile Picture')),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
@@ -66,7 +69,7 @@ class _SelfieState extends State<Selfie> {
 
             if (!mounted) return;
             int response = await APIService.doMultipartImagePost(path: "/user/event/verify-user", image: image);
-            if(response == 200){
+            if (response == 200) {
               FlutterBackgroundService().startService();
             }
 
@@ -74,6 +77,7 @@ class _SelfieState extends State<Selfie> {
               setState(() {
                 imagePath = image.path;
               });
+              _navigateToProfileScreen(context, image.path);
             }
           } catch (e) {
             if (kDebugMode) {
@@ -85,5 +89,9 @@ class _SelfieState extends State<Selfie> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  void _navigateToProfileScreen(BuildContext context, String imagePath) {
+    context.pop(imagePath);
   }
 }

@@ -103,8 +103,8 @@ class _LoginPageState extends State<LoginPage> {
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(_isPasswordVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility),
+                              ? Icons.visibility
+                              : Icons.visibility_off),
                           onPressed: () {
                             setState(() {
                               _isPasswordVisible = !_isPasswordVisible;
@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   _gap(),
-                  Row(
+                  /* Row(
                     children: [
                       Checkbox(
                         value: _rememberMe,
@@ -130,6 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                       const Text('Remember me'),
                     ],
                   ),
+                  */
                   _gap(),
                   GestureDetector(
                     onTap: () {

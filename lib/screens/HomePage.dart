@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui/screens/Selfie.dart';
 import '../services/shared_service.dart';
-import 'package:ui/screens/TakePictureScreen.dart';
+
+import 'AttendancePage.dart';
+import 'Selfie.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -54,8 +55,8 @@ class HomePage extends StatelessWidget {
               className: 'BSC IT',
               rollNumber: 'A000',
             ),
-            // const AttendancePage(),
-            const TakePictureScreen(),
+            const AttendancePage(),
+
           ],
         ),
       ),

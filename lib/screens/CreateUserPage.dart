@@ -15,6 +15,8 @@ class CreateUserPage extends StatefulWidget {
 
 class _CreateUserPageState extends State<CreateUserPage> {
   late List<UserResponseModel> users = [];
+  late Map<String, bool> userSelectionMap = {};
+  bool selectAll = false;
 
   @override
   void initState() {
@@ -27,42 +29,85 @@ class _CreateUserPageState extends State<CreateUserPage> {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView( // Wrap the Column widget with SingleChildScrollView
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
               const Text(
-                'Users:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                'All Users: ',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('SAP ID')),
-                      DataColumn(label: Text('First Name')),
-                      DataColumn(label: Text('Last Name')),
-                      DataColumn(label: Text('Roll No')),
-                      DataColumn(label: Text('Phone No')),
-                      DataColumn(label: Text('Email ID')),
-                      DataColumn(label: Text('Role')),
-                    ],
-                    rows: users.map((user) {
-                      return DataRow(cells: [
-                        DataCell(Text(user.iD)),
-                        DataCell(Text(user.fName)),
-                        DataCell(Text(user.lName)),
-                        DataCell(Text(user.rollNo)),
-                        DataCell(Text(user.phone)),
-                        DataCell(Text(user.email)),
-                        DataCell(Text(user.role.toString())),
-                      ]);
-                    }).toList(),
-                  ),
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: [
+                    DataColumn(
+                      label: Row(
+                        children: [
+                          Checkbox(
+                            value: selectAll,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                selectAll = value ?? false;
+                                userSelectionMap.forEach((key, _) {
+                                  userSelectionMap[key] = selectAll;
+                                });
+                              });
+                            },
+                          ),
+                          const Text('Select All'),
+                        ],
+                      ),
+                    ),
+                    const DataColumn(label: Text('SAP ID')),
+                    const DataColumn(label: Text('First Name')),
+                    const DataColumn(label: Text('Last Name')),
+                    const DataColumn(label: Text('Roll No')),
+                    const DataColumn(label: Text('Phone No')),
+                    const DataColumn(label: Text('Email ID')),
+                    const DataColumn(label: Text('Role')),
+                    const DataColumn(label: Text('Edit/Delete')),
+                  ],
+                  rows: users.map((user) {
+                    return DataRow(cells: [
+                      DataCell(Checkbox(
+                        value: userSelectionMap[user.iD] ?? false,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            userSelectionMap[user.iD] = value ?? false;
+                          });
+                        },
+                      )),
+                      DataCell(Text(user.iD)),
+                      DataCell(Text(user.fName)),
+                      DataCell(Text(user.lName)),
+                      DataCell(Text(user.rollNo)),
+                      DataCell(Text(user.phone)),
+                      DataCell(Text(user.email)),
+                      DataCell(Text(user.role.toString())),
+                      DataCell(Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              _editUser(user);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              _deleteUser(user);
+                            },
+                          ),
+                        ],
+                      )),
+                    ]);
+                  }).toList(),
                 ),
               ),
             ],
@@ -81,15 +126,15 @@ class _CreateUserPageState extends State<CreateUserPage> {
                     leading: const Icon(Icons.person_add),
                     title: const Text('Add Single User'),
                     onTap: () {
-                      Navigator.pop(context);
                       context.goNamed('single-user');
+                      context.pop();
                     },
                   ),
                   ListTile(
                     leading: const Icon(Icons.people_alt),
                     title: const Text('Add Bulk Users'),
                     onTap: () {
-                      Navigator.pop(context);
+                      context.pop();
                       _showAddBulkUsersDialog(context);
                     },
                   ),
@@ -104,11 +149,6 @@ class _CreateUserPageState extends State<CreateUserPage> {
     );
   }
 
-
-
-//pop up wala part for bulk user
-
-
   void _showAddBulkUsersDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -122,7 +162,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
               ElevatedButton(
                 onPressed: () async {
                   FilePickerResult? result =
-                      await FilePicker.platform.pickFiles(
+                  await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowedExtensions: ['csv'],
                   );
@@ -134,8 +174,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
                     print(file.size);
                     print(file.extension);
                     print(file.path);
-                  } else {
-                  }
+                  } else {}
                 },
                 child: const Text('Select CSV File'),
               ),
@@ -144,14 +183,14 @@ class _CreateUserPageState extends State<CreateUserPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.pop();
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 // TODO Handle the CSV file and add users
-                Navigator.pop(context);
+                context.pop();
               },
               child: const Text('Add'),
             ),
@@ -163,19 +202,30 @@ class _CreateUserPageState extends State<CreateUserPage> {
 
   void _fetchAllUsers() {
     APIService.doGet(path: "/admin/user/all-users").then(
-      (value) => {
+          (value) => {
         if (value != "")
           {
             setState(
-              () {
+                  () {
                 users = jsonDecode(value)
                     .map<UserResponseModel>(
                         (item) => UserResponseModel.fromJson(item))
                     .toList();
+                userSelectionMap = { for (var user in users) user.iD : false };
               },
             )
           }
       },
     );
   }
+}
+
+void _editUser(UserResponseModel user) {
+  //TODO
+  print('Edit user');
+}
+
+void _deleteUser(UserResponseModel user) {
+  //TODO
+  print('Delete user');
 }
