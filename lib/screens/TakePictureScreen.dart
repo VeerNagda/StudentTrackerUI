@@ -9,6 +9,7 @@ import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ui/services/api_service.dart';
+import 'package:ui/services/background.dart';
 
 import '../services/shared_service.dart';
 
@@ -25,6 +26,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late Future<void>? _initializeControllerFuture;
   static late double xCrop;
   static late double yCrop;
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +45,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       }
     }
   }
-
 
   _cropImage(XFile image) async {
     File imageFile = File(image.path);
@@ -67,11 +68,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
     // Crop the image
     img.Image croppedImage = img.copyCrop(
-    capturedImage,
-    newLeft,
-    newTop,
-    newWidth,
-    newHeight,
+      capturedImage,
+      newLeft,
+      newTop,
+      newWidth,
+      newHeight,
     );
 
     // Save the cropped image to a temporary file
@@ -106,7 +107,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     _controller.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -150,13 +150,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             int response = await APIService.doMultipartImagePost(
                 path: "/user/event/verify-user", image: rawImage);
             if (response == 200) {
+              /**/
               FlutterBackgroundService().startService();
-              Map<String, dynamic> data = {
-                "sap": SharedService.sapId,
-                "event_id": SharedService.eventId,
-                "event_end_time": SharedService.eventEndTime,
-              };
-              FlutterBackgroundService().invoke("setData", data);
+
+
               if (kDebugMode) {
                 print("sent data");
               }
@@ -195,10 +192,13 @@ class MyClip extends CustomClipper<Rect> {
   @override
   Rect getClip(Size size) {
     Random random = Random();
-    TakePictureScreenState.yCrop = 55 + random.nextDouble() * 255; // Adjust the Y position as needed
-    TakePictureScreenState.xCrop = 5 + random.nextDouble() * 195; // Adjust the X position as needed
+    TakePictureScreenState.yCrop =
+        55 + random.nextDouble() * 255; // Adjust the Y position as needed
+    TakePictureScreenState.xCrop =
+        5 + random.nextDouble() * 195; // Adjust the X position as needed
 
-    return Rect.fromLTWH(TakePictureScreenState.xCrop, TakePictureScreenState.yCrop, 210, 210);
+    return Rect.fromLTWH(
+        TakePictureScreenState.xCrop, TakePictureScreenState.yCrop, 210, 210);
   }
 
   @override

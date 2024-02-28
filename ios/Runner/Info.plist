@@ -28,6 +28,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Explanation on why the camera access is needed.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Explanation on why the location access is needed.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Explanation on why the location access is needed.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Explanation on why the location access is needed.</string>
 	<key>NSMicrophoneUsageDescription</key>

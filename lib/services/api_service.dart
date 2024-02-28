@@ -66,11 +66,11 @@ class APIService {
     }
   }
 
-
   static Future<int> doPut(
       {required BuildContext? context,
       required Map<String, dynamic> data,
-      required String path, required String param}) async {
+      required String path,
+      required String param}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
 
     Map<String, String> requestHeaders = {
@@ -95,13 +95,15 @@ class APIService {
   }
 
   static Future<String> doGet(
-      {required String path, Map<String, String>? query, bool inValidateCache=false}) async {
+      {required String path,
+      Map<String, String>? query,
+      bool inValidateCache = false}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${loginData!.accessToken}',
     };
-    if(inValidateCache){
+    if (inValidateCache) {
       requestHeaders['Cache-Control'] = 'no-cache';
     }
     Uri url;
@@ -127,7 +129,6 @@ class APIService {
 
     Uri url = Uri.http(Constants.baseUri, "/api$path/$param");
 
-
     var response = await http.delete(url, headers: requestHeaders);
 
     return response.statusCode;
@@ -140,7 +141,9 @@ class APIService {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
 
     request.headers['Authorization'] = 'Bearer ${loginData!.accessToken}';
-
+    var permission = await Geolocator.checkPermission();
+    print(permission);
+    Geolocator.requestPermission();
     Position position = await LocationService.getCurrentPosition();
     String coordinates = "${position.latitude} ${position.longitude}";
 
@@ -200,5 +203,4 @@ class APIService {
     }
     return response.statusCode;
   }
-
 }

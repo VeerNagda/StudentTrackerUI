@@ -58,30 +58,17 @@ void onStart(ServiceInstance service) {
   DartPluginRegistrant.ensureInitialized();
   setDetails();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
-
-
-
-
-
+      FlutterLocalNotificationsPlugin();
 
   if (service is AndroidServiceInstance) {
     service.setAsBackgroundService();
   }
-
-/*  service.on('setData').listen((event) {
-    sapId = event?["sap"];
-    eventId = event?["event_id"];
-    eventEndTime = event?["event_end_time"];
-    print("$sapId $eventId $eventEndTime");
-  });*/
 
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
   Timer.periodic(const Duration(minutes: 1), (timer) async {
     if (service is AndroidServiceInstance) {
-
       flutterLocalNotificationsPlugin.show(
         notificationId,
         'Geolocation',
@@ -96,9 +83,10 @@ void onStart(ServiceInstance service) {
         ),
       );
     }
-      await LocationService.getPosition(sapId!, eventId!);
+    await LocationService.getPosition(sapId!, eventId!);
 
-    if (DateTime.now().isAfter(eventEndTime!)) {
+    if (DateTime.now().isAfter(eventEndTime!) &&
+        LocationService.coordinates == []) {
       service.stopSelf();
     }
     service.invoke('update');
@@ -112,10 +100,8 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   return true;
 }
 
-
-
-Future<void>setDetails()async {
-  SharedService.prefs =await  SharedPreferences.getInstance();
+Future<void> setDetails() async {
+  SharedService.prefs = await SharedPreferences.getInstance();
   sapId = SharedService.prefs.getString("sapId");
   eventId = SharedService.prefs.getString("eventId");
   eventEndTime = DateTime.parse(SharedService.prefs.getString("eventEndTime")!);
