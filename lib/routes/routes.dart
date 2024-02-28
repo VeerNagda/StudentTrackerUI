@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:ui/screens/AddGroup.dart';
+import 'package:ui/screens/AddSingleUser.dart';
 import 'package:ui/screens/AdminHomePage.dart';
 import 'package:ui/screens/HomePage.dart';
 import 'package:ui/screens/TakePictureScreen.dart';
@@ -56,6 +57,11 @@ class RouteConfig {
                 builder: (context,state) => const MapScreen(),
               ),
 
+              GoRoute(
+                path: "single-user",
+                name:"single-user",
+                builder: (context,state) => const AddSingleUserPage(),
+              ),
 
 
               GoRoute(

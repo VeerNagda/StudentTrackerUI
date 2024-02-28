@@ -2,13 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'AddSingleUser.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:ui/models/user/user_response_model.dart';
 import 'package:ui/services/api_service.dart';
 
 class CreateUserPage extends StatefulWidget {
-  const CreateUserPage({Key? key}) : super(key: key);
+  const CreateUserPage({super.key});
 
   @override
   _CreateUserPageState createState() => _CreateUserPageState();
