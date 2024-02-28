@@ -1,4 +1,3 @@
-import 'package:latlong2/latlong.dart';
 
 class LocationRequestModel {
   late String sapId;
@@ -29,7 +28,7 @@ class LocationRequestModel {
 }
 
 class TimedCoordinates {
-  late List<LatLng> coordinates;
+  late List<double> coordinates;
   late String dateTime;
 
   TimedCoordinates({required this.coordinates, required this.dateTime});

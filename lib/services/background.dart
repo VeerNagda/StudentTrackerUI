@@ -86,7 +86,7 @@ void onStart(ServiceInstance service) {
     await LocationService.getPosition(sapId!, eventId!);
 
     if (DateTime.now().isAfter(eventEndTime!) &&
-        LocationService.coordinates == []) {
+        LocationService.location!.timedCoordinates == []) {
       service.stopSelf();
     }
     service.invoke('update');

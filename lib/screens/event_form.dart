@@ -123,13 +123,13 @@ class _EventFormState extends State<EventForm> {
               lastDate: DateTime(2100),
             );
 
-            if (pickedStartDate != null) {
+            if (pickedStartDate != null && mounted) {
               TimeOfDay? pickedStartTime = await showTimePicker(
                 context: context,
                 initialTime: TimeOfDay.fromDateTime(pickedStartDate),
               );
 
-              if (pickedStartTime != null) {
+              if (pickedStartTime != null && mounted) {
                 DateTime? pickedEndDate = await showDatePicker(
                   context: context,
                   initialDate: initialEndDate,
@@ -137,7 +137,7 @@ class _EventFormState extends State<EventForm> {
                   lastDate: DateTime(2100),
                 );
 
-                if (pickedEndDate != null) {
+                if (pickedEndDate != null && mounted) {
                   TimeOfDay? pickedEndTime = await showTimePicker(
                     context: context,
                     initialTime: TimeOfDay.fromDateTime(pickedEndDate),

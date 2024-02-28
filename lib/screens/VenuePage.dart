@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -31,6 +32,7 @@ class _VenuesPageState extends State<VenuesPage> {
                   (item) => VenueResponseModel.fromJson(item))
               .toList();
         });
+        context.pop();
       }
     });
   }
@@ -135,8 +137,8 @@ class _VenuesPageState extends State<VenuesPage> {
             ),
             TextButton(
               onPressed: () {
-               // _deleteVenue(venue);
-                Navigator.pop(context);
+               _deleteVenue(venue);
+
               },
               child: const Text('Delete'),
             ),
@@ -146,22 +148,21 @@ class _VenuesPageState extends State<VenuesPage> {
     );
   }
 
-  /*void _deleteVenue(VenueResponseModel venue) {
-    Map<String, String> query = {
-      "venueId": venue.id
-    };
-    APIService.doDelete(path: "/admin/delete-venue", query: query).then((value) {
-      if (value == "Success") {
+  void _deleteVenue(VenueResponseModel venue) {
+    APIService.doDelete(path: "/admin/venue/delete-venue", param: venue.id).then((value) {
+      if (value == 204) {
         setState(() {
-          venues.remove(venue);
+          _fetchVenues();
         });
       }
     });
-  }*/
+  }
 
   _navigateToVenueDetails(VenueResponseModel selectedEvent) {
-    print('Selected Venue Details:');
-    print('Venue ID: ${selectedEvent.id}');
-    print('Venue Name: ${selectedEvent.id}');
+    if (kDebugMode) {
+      print('Selected Venue Details:');
+      print('Venue ID: ${selectedEvent.id}');
+      print('Venue Name: ${selectedEvent.id}');
+    }
   }
 }
