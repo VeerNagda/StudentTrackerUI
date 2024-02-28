@@ -28,7 +28,8 @@ class _LoginPageState extends State<LoginPage> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFe4efe9), Color(0xFF93a5cf)],
+            //colors: [Color(0xFFe4efe9), Color(0xFF93a5cf)],
+           colors: [Color(0xFFcd9cf2), Color(0xFFf6f3ff)],
           ),
         ),
         child: Form(
@@ -142,7 +143,6 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Text(
                       "Forgot Password",
                       style: TextStyle(
-                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -183,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+
                             ),
                           ),
                         ),

@@ -2,22 +2,29 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 
 class PasswordChangePage extends StatelessWidget {
-  const PasswordChangePage({super.key});
+  const PasswordChangePage({Key? key}) : super(key: key);
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Password'),
-        backgroundColor: Colors.white, // Change to white
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        backgroundColor: Colors.transparent, // Set app bar color to transparent
+        elevation: 0, // Remove app bar shadow
       ),
+      extendBodyBehindAppBar: true, // Extend body behind app bar
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFe4efe9), Color(0xFF93a5cf)],
+            colors: [Color(0xFFcd9cf2), Color(0xFFf6f3ff)],
           ),
         ),
         child: Padding(
@@ -26,12 +33,16 @@ class PasswordChangePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Change Password',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                const Icon(
+                  Icons.admin_panel_settings,
+                  size: 150,
+                  color: Colors.white,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    "Change Password",
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -86,8 +97,7 @@ class PasswordChangePage extends StatelessWidget {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-
-                      // Navigate to the Main Login Page which is MyApp
+                    // Navigate to the Main Login Page which is MyApp
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -96,15 +106,14 @@ class PasswordChangePage extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black, backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-
-
                   child: const Padding(
-                    padding: EdgeInsets.all(12.0),
+                    padding: EdgeInsets.all(10.0),
                     child: Text(
                       'Change Password',
                       style: TextStyle(
