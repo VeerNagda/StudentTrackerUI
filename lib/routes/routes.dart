@@ -44,12 +44,6 @@ class RouteConfig {
             builder: (context, state) => const AdminHomePage(),
 
             routes:[
-              GoRoute(
-                  path: "add-event",
-                  name: "add-event",
-                  builder: (context,state) => const EventForm(),
-              ),
-
 
               GoRoute(
                 path: "add-venue",
@@ -62,12 +56,15 @@ class RouteConfig {
                 name:"single-user",
                 builder: (context,state) => const AddSingleUserPage(),
               ),
-
-
               GoRoute(
                 path: "bulk-user",
                 name:"bulk-user",
                 builder: (context,state) => const AddGroup(),
+              ),
+              GoRoute(
+                path: "add-event",
+                name:"add-event",
+                builder: (context,state) => EventForm(eventId: state.uri.queryParameters["eventId"]),
               )
 
 

@@ -1,66 +1,122 @@
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:ui/models/event/event_response_model.dart';
+import 'dart:convert';
 
-class EventFormResult {
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:ui/models/StudentGroup/group_list_response_model.dart';
+import 'package:ui/models/event/event_all_data_model.dart';
+import 'package:ui/models/venue/venue_response_model.dart';
+import 'package:ui/services/api_service.dart';
+
+/*class EventFormResult {
   final EventResponseModel? event;
 
   EventFormResult({this.event});
-}
+}*/
 
 class EventForm extends StatefulWidget {
-  final EventResponseModel? initialEvent; // Add initialEvent named parameter
+  //final EventResponseModel? initialEvent; // Add initialEvent named parameter
+  final String? eventId;
 
-  const EventForm({super.key, this.initialEvent});
+  const EventForm({super.key, required this.eventId});
 
   @override
-  _EventFormState createState() => _EventFormState();
+  EventFormState createState() => EventFormState();
 }
 
-class _EventFormState extends State<EventForm> {
+class EventFormState extends State<EventForm> {
   late TextEditingController eventIdController;
   late TextEditingController eventNameController;
   DateTime? startDate;
   DateTime? endDate;
-  List<Venue> selectedVenues = [];
+  List<String> selectedVenues = [];
+  List<String> selectedGroups = [];
+
+  EventAllDataModel? event;
+
+  late List<Venues> venues = [];
+  late List<Groups> groups = [];
 
   // for venue pop up
-  List<Venue> venues = [
-    Venue(venueID: '1', venueName: 'Venue 1'),
-    Venue(venueID: '2', venueName: 'Venue 2'),
-    Venue(venueID: '3', venueName: 'Venue 3'),
-    Venue(venueID: '4', venueName: 'Venue 4'),
-    Venue(venueID: '5', venueName: 'Venue 5'),
-    Venue(venueID: '6', venueName: 'Venue 6'),
-    Venue(venueID: '7', venueName: 'Venue 7'),
-    Venue(venueID: '8', venueName: 'Venue 8'),
-    Venue(venueID: '9', venueName: 'Venue 9'),
-    Venue(venueID: '4', venueName: 'Venue 4'),
 
-  ];
+  void _fetchEventData() {
+    var eventId = widget.eventId;
+    APIService.doGet(path: "/admin/event/event-details/$eventId").then((value) => {
+          if (value != "")
+            {
+
+              event = EventAllDataModel.fromJson(jsonDecode(value)),
+              if (event != null)
+                {
+                  eventIdController =
+                      TextEditingController(text: event?.event.iD ?? ''),
+                  eventNameController =
+                      TextEditingController(text: event?.event.name ?? ''),
+                  startDate = event?.event.startDate,
+                  endDate = event?.event.endDate,
+                  for (var group in event?.groups ?? [])
+                    {
+                      selectedGroups.add(group.iD),
+                    },
+                  for (var group in event?.groups ?? [])
+                    {
+                      selectedGroups.add(group.iD),
+                    },
+                },
+              setState(() {}),
+            }
+        });
+  }
+
+  void _fetchVenuesGroups() {
+    APIService.doGet(path: "/admin/venue/all-venues").then((value) {
+      if (value != "") {
+        setState(() {
+          venues = jsonDecode(value)
+              .map<VenueResponseModel>(
+                  (item) => VenueResponseModel.fromJson(item))
+              .toList();
+        });
+      }
+    });
+    APIService.doGet(path: "/admin/group/all-groups").then((value) {
+      if (value != "") {
+        setState(() {
+          groups = jsonDecode(value)
+              .map<GroupListResponseModel>(
+                  (item) => GroupListResponseModel.fromJson(item))
+              .toList();
+        });
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    eventNameController = TextEditingController();
+    eventIdController = TextEditingController();
+    _fetchVenuesGroups();
+    if (widget.eventId != null) {
+      _fetchEventData();
+    }
 
-    eventIdController = TextEditingController(text: widget.initialEvent?.eventID ?? '');
-    eventNameController = TextEditingController(text: widget.initialEvent?.eventName ?? '');
-    startDate = widget.initialEvent?.startDate ;
-    endDate = widget.initialEvent?.endDate ;
-    selectedVenues = widget.initialEvent?.venue ?? [];
+    //selectedVenues = widget.initialEvent?.venue ?? [];
 
     // event id is disabled
-    if (widget.initialEvent != null) {
-      eventIdController.text = widget.initialEvent!.eventID;
-      eventNameController.text = widget.initialEvent!.eventName;
-      eventIdController.selection = TextSelection.fromPosition(TextPosition(offset: eventIdController.text.length));
+    if (widget.eventId != null && event != null) {
+      eventIdController.text = event?.event.iD ?? "";
+      eventNameController.text = event?.event.name ?? "";
+      eventIdController.selection = TextSelection.fromPosition(
+          TextPosition(offset: eventIdController.text.length));
       eventIdController.addListener(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isEditing = widget.initialEvent != null;
+    bool isEditing = event != null;
 
     return Scaffold(
       appBar: AppBar(
@@ -72,15 +128,21 @@ class _EventFormState extends State<EventForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildTextFormField('Event ID', eventIdController, !isEditing), // Disable only when editing
+              _buildTextFormField('Event ID', eventIdController, !isEditing),
+              // Disable only when editing
               const SizedBox(height: 12),
-              _buildTextFormField('Event Name', eventNameController, true), // Enable for both editing and creating
+              _buildTextFormField('Event Name', eventNameController, true),
+              // Enable for both editing and creating
               const SizedBox(height: 12),
               _buildDateRangeSelectionButton('Start Date and End Date '),
               const SizedBox(height: 12),
               _buildVenueSelectionButton(),
               const SizedBox(height: 12),
               _buildSelectedVenuesText(),
+              const SizedBox(height: 12),
+              _buildGroupSelectionButton(),
+              const SizedBox(height: 12),
+              _buildSelectedGroupsText(),
               const SizedBox(height: 24),
               _buildSaveEventButton(),
             ],
@@ -90,13 +152,15 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-  Widget _buildTextFormField(String label, TextEditingController controller, bool enabled) {
+  Widget _buildTextFormField(
+      String label, TextEditingController controller, bool enabled) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
       ),
-      enabled: enabled, // true false based
+      enabled: enabled,
+      // true false based
       readOnly: !enabled,
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -165,12 +229,12 @@ class _EventFormState extends State<EventForm> {
               }
             }
           },
-          child: Text('$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
+          child: Text(
+              '$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
         ),
       ],
     );
   }
-
 
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime != null) {
@@ -180,9 +244,13 @@ class _EventFormState extends State<EventForm> {
     }
   }
 
-
   Widget _buildSelectedVenuesText() {
     return Text('Selected Venues: ${selectedVenues.length}');
+  }
+
+  //group
+  Widget _buildSelectedGroupsText() {
+    return Text('Selected Groups: ${selectedGroups.length}');
   }
 
   Widget _buildSaveEventButton() {
@@ -197,7 +265,7 @@ class _EventFormState extends State<EventForm> {
   Widget _buildVenueSelectionButton() {
     return ElevatedButton(
       onPressed: () async {
-        List<Venue>? selectedVenuesResult = await showDialog<List<Venue>>(
+        List<String>? selectedVenuesResult = await showDialog<List<String>>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
@@ -209,23 +277,24 @@ class _EventFormState extends State<EventForm> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       SizedBox(
-                        height: 200, // Adjust the height according to your requirement
+                        height: 200,
+                        // Adjust the height according to your requirement
                         child: SingleChildScrollView(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: List.generate(
                               venues.length,
-                                  (index) {
+                              (index) {
                                 final venue = venues[index];
                                 return CheckboxListTile(
-                                  title: Text(venue.venueName),
-                                  value: selectedVenues.contains(venue),
+                                  title: Text(venue.name),
+                                  value: selectedVenues.contains(venue.iD),
                                   onChanged: (bool? value) {
                                     setState(() {
                                       if (value != null && value) {
-                                        selectedVenues.add(venue);
+                                        selectedVenues.add(venue.iD);
                                       } else {
-                                        selectedVenues.remove(venue);
+                                        selectedVenues.remove(venue.iD);
                                       }
                                     });
                                   },
@@ -242,7 +311,8 @@ class _EventFormState extends State<EventForm> {
                           ElevatedButton(
                             onPressed: () {
                               setState(() {
-                                selectedVenues.clear(); // Clear all selected venues
+                                selectedVenues
+                                    .clear(); // Clear all selected venues
                               });
                             },
                             child: const Text('Clear All'),
@@ -272,22 +342,105 @@ class _EventFormState extends State<EventForm> {
     );
   }
 
-
-
+  Widget _buildGroupSelectionButton() {
+    return ElevatedButton(
+      onPressed: () async {
+        List<String>? selectedGroupsResult = await showDialog<List<String>>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Select Group'),
+              content: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        height: 200,
+                        // Adjust the height according to your requirement
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: List.generate(
+                              groups.length,
+                              (index) {
+                                final group = groups[index];
+                                return CheckboxListTile(
+                                  title: Text(group.name),
+                                  value: selectedGroups.contains(group.iD),
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      if (value != null && value) {
+                                        selectedGroups.add(group.iD);
+                                      } else {
+                                        selectedGroups.remove(group.iD);
+                                      }
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedGroups
+                                    .clear(); // Clear all selected venues
+                              });
+                            },
+                            child: const Text('Clear All'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context, selectedGroups);
+                            },
+                            child: const Text('Save'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        );
+        if (selectedGroupsResult != null) {
+          setState(() {
+            selectedGroups = selectedGroupsResult;
+          });
+        }
+      },
+      child: const Text('Select Group'),
+    );
+  }
 
   void _saveEvent() {
     if (eventIdController.text.isEmpty || eventNameController.text.isEmpty) {
       return;
     }
 
-    EventResponseModel newEvent = EventResponseModel(
-      eventID: eventIdController.text,
-      eventName: eventNameController.text,
-      startDate: startDate,
-      endDate: endDate,
-      venue: selectedVenues,
-    );
+    String eventID = eventIdController.text;
+    String eventName = eventNameController.text;
+    DateTime? startEventDate = startDate;
+    DateTime? endEventDate = endDate;
+    List venue = selectedVenues;
 
-    Navigator.pop(context, EventFormResult(event: newEvent));
+    if (kDebugMode) {
+      print(eventID);
+      print(eventName);
+      print(startEventDate);
+      print(endEventDate);
+      print(venue);
+    }
+
+    context.pop();
   }
 }

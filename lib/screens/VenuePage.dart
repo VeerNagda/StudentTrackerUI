@@ -32,7 +32,7 @@ class _VenuesPageState extends State<VenuesPage> {
                   (item) => VenueResponseModel.fromJson(item))
               .toList();
         });
-        context.pop();
+        //context.pop();
       }
     });
   }

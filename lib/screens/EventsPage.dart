@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:ui/models/event/event_response_model.dart';
@@ -101,32 +102,11 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   _navigateToEventForm() async {
-    EventFormResult result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const EventForm()),
-    );
-    if (result.event != null) {
-      setState(() {
-        events.add(result.event!);
-      });
-    }
+    context.pushNamed("add-event");
   }
 
   _navigateToEventFormForEditing(EventResponseModel event) async {
-    EventFormResult result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EventForm(initialEvent: event),
-      ),
-    );
-
-
-    if (result.event != null) {
-      setState(() {
-        events.remove(event);
-        events.add(result.event!);
-      });
-    }
+    context.pushNamed("add-event",queryParameters: {"eventId": event.eventID});
   }
 
   _showDeleteConfirmationDialog(EventResponseModel event) {
