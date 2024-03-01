@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:ui/services/api_service.dart';
 
 enum UserRole { Admin, Student }
 
 class AddSingleUserPage extends StatefulWidget {
-  const AddSingleUserPage({super.key });
+  const AddSingleUserPage({super.key});
 
   @override
   _AddSingleUserPageState createState() => _AddSingleUserPageState();
@@ -14,6 +17,8 @@ class _AddSingleUserPageState extends State<AddSingleUserPage> {
   TextEditingController sapIdController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
   TextEditingController rollNumberController = TextEditingController();
   UserRole? selectedRole;
 
@@ -40,6 +45,14 @@ class _AddSingleUserPageState extends State<AddSingleUserPage> {
             TextField(
               controller: lastNameController,
               decoration: const InputDecoration(labelText: 'Last Name'),
+            ),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: 'Email Id'),
+            ),
+            TextField(
+              controller: phoneController,
+              decoration: const InputDecoration(labelText: 'Phone No.'),
             ),
             TextField(
               controller: rollNumberController,
@@ -81,6 +94,8 @@ class _AddSingleUserPageState extends State<AddSingleUserPage> {
     String sapId = sapIdController.text;
     String firstName = firstNameController.text;
     String lastName = lastNameController.text;
+    String email = emailController.text;
+    String phone = phoneController.text;
     String rollNumber = rollNumberController.text;
     int roleValue;
 
@@ -91,23 +106,30 @@ class _AddSingleUserPageState extends State<AddSingleUserPage> {
       roleValue = 1;
     }
 
-    print('SAP ID: $sapId');
-    print('First Name: $firstName');
-    print('Last Name: $lastName');
-    print('Roll Number: $rollNumber');
-    print('Role: $selectedRole');
-
-    sapIdController.clear();
-    firstNameController.clear();
-    lastNameController.clear();
-    rollNumberController.clear();
-
-    Fluttertoast.showToast(
-      msg: 'Successfully added',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.white60,
-      textColor: Colors.purple,
+    Map<String, dynamic> data = {
+      "sapId": sapId,
+      "firstName": firstName,
+      "lastName": lastName,
+      "rollNumber": rollNumber,
+      "email": email,
+      "phone": phone,
+      "role": roleValue
+    };
+    print(jsonEncode(data));
+    APIService.doPostInsert(
+            context: context, data: data, path: "/admin/user/create-single-user")
+        .then(
+      (value) => {
+        if (value == 201)
+          {
+            sapIdController.clear(),
+            firstNameController.clear(),
+            lastNameController.clear(),
+            rollNumberController.clear(),
+            phoneController.clear(),
+            emailController.clear(),
+          }
+      },
     );
   }
 
@@ -117,6 +139,8 @@ class _AddSingleUserPageState extends State<AddSingleUserPage> {
     firstNameController.dispose();
     lastNameController.dispose();
     rollNumberController.dispose();
+    phoneController.dispose();
+    emailController.dispose();
     super.dispose();
   }
 }
