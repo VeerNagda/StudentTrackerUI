@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../services/shared_service.dart';
 
 import 'AttendancePage.dart';
-import 'Selfie.dart';
 
-import 'AttendancePage.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

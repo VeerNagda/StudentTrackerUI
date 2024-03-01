@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 class ReportAttendance extends StatelessWidget {
   final List<ReportAttendance>? events;
 
-  const ReportAttendance({Key? key, this.events}) : super(key: key);
+  const ReportAttendance({super.key, this.events});
 
   @override
   Widget build(BuildContext context) {
@@ -59,12 +59,12 @@ class ReportAttendance extends StatelessWidget {
 }
 
 class DownloadButton extends StatelessWidget {
-  const DownloadButton({Key? key}) : super(key: key);
+  const DownloadButton({super.key});
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.download),
+      icon: const Icon(Icons.download),
       onPressed: () {
         _showConfirmationDialog(context);
       },
@@ -81,7 +81,7 @@ class DownloadButton extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                // Perform download action here
+                // TODO Perform download action here
                 context.pop();
               },
               child: const Text("Yes"),

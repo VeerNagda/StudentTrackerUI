@@ -27,6 +27,16 @@ class _CreateUserPageState extends State<CreateUserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'All Users',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: _buildAppBarActions(),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
@@ -34,14 +44,6 @@ class _CreateUserPageState extends State<CreateUserPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text(
-                'All Users: ',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 15),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
@@ -149,6 +151,83 @@ class _CreateUserPageState extends State<CreateUserPage> {
     );
   }
 
+
+// Delete icon for
+  List<Widget> _buildAppBarActions() {
+    if (selectAll) {
+      return [
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () {
+            _deleteSelectedUsers();
+          },
+        ),
+      ];
+    } else {
+      return [];
+    }
+  }
+
+  void _deleteSelectedUsers() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Selected Users'),
+          content: const Text('Are you sure you want to delete all the selected users?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _removeSelectedUsers();
+                context.pop();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  void _removeSelectedUsers() {
+    List<String> selectedUserIDs = userSelectionMap.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
+
+
+    setState(() {
+      users.removeWhere((user) => selectedUserIDs.contains(user.iD));
+      selectedUserIDs.forEach((id) => userSelectionMap.remove(id));
+    });
+
+    selectedUserIDs.forEach((id) {
+      //TODO API
+      /*
+      APIService.doDeleteUser(id).then((success) {
+        if (success) {
+          // Show a snackbar or toast to indicate successful deletion
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Selected users deleted successfully.'),
+          ));
+        } else {
+          // Show a snackbar or toast to indicate failure
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Failed to delete selected users.'),
+          ));
+        }
+      }); */
+    });
+  }
+
+
   void _showAddBulkUsersDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -161,8 +240,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
               const Text('Select a CSV file to add users in bulk.'),
               ElevatedButton(
                 onPressed: () async {
-                  FilePickerResult? result =
-                  await FilePicker.platform.pickFiles(
+                  FilePickerResult? result = await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowedExtensions: ['csv'],
                   );
@@ -211,21 +289,69 @@ class _CreateUserPageState extends State<CreateUserPage> {
                     .map<UserResponseModel>(
                         (item) => UserResponseModel.fromJson(item))
                     .toList();
-                userSelectionMap = { for (var user in users) user.iD : false };
+                userSelectionMap = {for (var user in users) user.iD: false};
               },
             )
           }
       },
     );
   }
-}
 
-void _editUser(UserResponseModel user) {
-  //TODO
-  print('Edit user');
-}
+  //TODO edit functionality
+  void _editUser(UserResponseModel user) {
+    context.goNamed('single-user');
+  }
 
-void _deleteUser(UserResponseModel user) {
-  //TODO
-  print('Delete user');
+  void _deleteUser(UserResponseModel user) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete User'),
+          content: const Text('Are you sure you want to delete this user?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.pop();
+                _removeUser(user);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _removeUser(UserResponseModel user) {
+    // Removing the user from the list
+    setState(() {
+      users.remove(user);
+      userSelectionMap.remove(user.iD);
+    });
+
+
+    //TODO check
+    /* APIService.doDeleteUser(user.iD).then((success) {
+      if (success) {
+        // Show a snack-bar or toast to indicate successful deletion
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('User deleted successfully.'),
+        ));
+      } else {
+        // Show a snack-bar or toast to indicate failure
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Failed to delete user.'),
+        ));
+      }
+    }); */
+
+  }
+
 }

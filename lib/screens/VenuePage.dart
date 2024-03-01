@@ -138,6 +138,7 @@ class _VenuesPageState extends State<VenuesPage> {
             TextButton(
               onPressed: () {
                _deleteVenue(venue);
+               context.pop();
 
               },
               child: const Text('Delete'),

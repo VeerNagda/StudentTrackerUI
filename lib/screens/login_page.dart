@@ -13,7 +13,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
-  bool _rememberMe = false;
+  final bool _rememberMe = false;
   late String _enteredSapId; // Declare variable to store entered SAP ID
   late String _enteredPassword; // Declare variable to store entered SAP ID
   bool isAPICallProcess = false;

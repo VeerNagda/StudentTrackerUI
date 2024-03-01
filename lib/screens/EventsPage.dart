@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:ui/models/event/event_response_model.dart';
 import 'package:ui/services/api_service.dart';
-import 'event_form.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -119,14 +118,14 @@ class _EventsPageState extends State<EventsPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.pop();
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 _deleteEvent(event);
-                Navigator.pop(context);
+                context.pop();
               },
               child: const Text('Delete'),
             ),

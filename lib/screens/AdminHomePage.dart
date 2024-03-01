@@ -28,8 +28,7 @@ class AdminHomePage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-                // have not used go router yet
-                // TO DO VEER
+                // TODO VEER
                 SharedService.prefs.remove("accessToken");
                 SharedService.prefs.remove("role");
                 SharedService.prefs.remove("sapId");
@@ -42,7 +41,7 @@ class AdminHomePage extends StatelessWidget {
             tabs: [
               Tab(text: 'Events'),
               Tab(text: 'Venue'),
-              Tab(text: 'Student Group'),
+              Tab(text: 'User Group'),
               Tab(text: 'Attendance'),
             ],
           ),
