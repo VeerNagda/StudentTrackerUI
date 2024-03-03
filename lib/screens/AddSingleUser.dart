@@ -28,7 +28,7 @@ class _AddSingleUserPageState extends State<AddSingleUserPage> {
       appBar: AppBar(
         title: const Text('Add Single User'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
