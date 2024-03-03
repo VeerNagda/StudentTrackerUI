@@ -15,21 +15,24 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   late List<EventResponseModel> events = [];
 
+  _fetchEvents() {
+    APIService.doGet(path: "/admin/get-upcoming-events").then((value) => {
+          if (value != "")
+            {
+              setState(() {
+                events = jsonDecode(value)
+                    .map<EventResponseModel>(
+                        (item) => EventResponseModel.fromJson(item))
+                    .toList();
+              }),
+            }
+        });
+  }
+
   @override
   void initState() {
     super.initState();
-    APIService.doGet(path: "/admin/get-upcoming-events").then((value) => {
-      if (value != "")
-        {
-          setState(() {
-            events = jsonDecode(value)
-                .map<EventResponseModel>(
-                    (item) => EventResponseModel.fromJson(item))
-                .toList();
-          }),
-          print(events)
-        }
-    });
+    _fetchEvents();
   }
 
   @override
@@ -43,52 +46,53 @@ class _EventsPageState extends State<EventsPage> {
         padding: const EdgeInsets.all(8.0),
         child: events.isEmpty
             ? const Center(
-          child: Text(
-            'No events yet. '
-                'Tap the + button to add an event.',
-            style: TextStyle(fontSize: 16.0),
-          ),
-        )
+                child: Text(
+                  'No events yet. '
+                  'Tap the + button to add an event.',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              )
             : ListView.builder(
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 5,
-              margin:
-              const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: ListTile(
-                title: Text(events[index].eventName),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Venues: ${events[index].venue?.length}'),
-                    Text('Date: ${_formatDateTime(events[index].startDate)} - ${_formatDateTime(events[index].endDate)}'),
-                  ],
-                ),
-                onTap: () {
-                  _navigateToEventDetails(events[index]);
+                itemCount: events.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    elevation: 5,
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListTile(
+                      title: Text(events[index].eventName),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Venues: ${events[index].venue?.length}'),
+                          Text(
+                              'Date: ${_formatDateTime(events[index].startDate)} - ${_formatDateTime(events[index].endDate)}'),
+                        ],
+                      ),
+                      onTap: () {
+                        _navigateToEventDetails(events[index]);
+                      },
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              _navigateToEventFormForEditing(events[index]);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              _showDeleteConfirmationDialog(events[index]);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 },
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () {
-                        _navigateToEventFormForEditing(events[index]);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        _showDeleteConfirmationDialog(events[index]);
-                      },
-                    ),
-                  ],
-                ),
               ),
-            );
-          },
-        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -101,11 +105,17 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   _navigateToEventForm() async {
-    context.pushNamed("add-event");
+    context.pushNamed("add-event").then((value) => {
+          _fetchEvents(),
+        });
   }
 
   _navigateToEventFormForEditing(EventResponseModel event) async {
-    context.pushNamed("add-event",queryParameters: {"eventId": event.eventID});
+    context.pushNamed("add-event", queryParameters: {
+      "eventId": event.eventID
+    }).then((value) => {
+          _fetchEvents(),
+        });
   }
 
   _showDeleteConfirmationDialog(EventResponseModel event) {
@@ -136,14 +146,13 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   _deleteEvent(EventResponseModel event) {
-    APIService.doDelete(path: "/admin/delete-event", param: event.eventID).then((value) => {
-      if (value == 204)
-        {
-          setState(() {
-            events.remove(event);
-          })
-        }
-    });
+    APIService.doDelete(path: "/admin/event/delete-event", param: event.eventID)
+        .then((value) => {
+              if (value == 204)
+                {
+                  _fetchEvents(),
+                }
+            });
   }
 
   _navigateToEventDetails(EventResponseModel selectedEvent) {

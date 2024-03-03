@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -9,14 +8,9 @@ import 'package:ui/models/event/event_all_data_model.dart';
 import 'package:ui/models/venue/venue_response_model.dart';
 import 'package:ui/services/api_service.dart';
 
-/*class EventFormResult {
-  final EventResponseModel? event;
 
-  EventFormResult({this.event});
-}*/
 
 class EventForm extends StatefulWidget {
-  //final EventResponseModel? initialEvent; // Add initialEvent named parameter
   final String? eventId;
 
   const EventForm({super.key, required this.eventId});
@@ -35,38 +29,38 @@ class EventFormState extends State<EventForm> {
 
   EventAllDataModel? event;
 
-  late List<Venues> venues = [];
-  late List<Groups> groups = [];
+  late List<VenueResponseModel> venues = [];
+  late List<GroupListResponseModel> groups = [];
 
   // for venue pop up
 
   void _fetchEventData() {
     var eventId = widget.eventId;
-    APIService.doGet(path: "/admin/event/event-details/$eventId").then((value) => {
-          if (value != "")
-            {
-
-              event = EventAllDataModel.fromJson(jsonDecode(value)),
-              if (event != null)
+    APIService.doGet(path: "/admin/event/event-details/$eventId")
+        .then((value) => {
+              if (value != "")
                 {
-                  eventIdController =
-                      TextEditingController(text: event?.event.iD ?? ''),
-                  eventNameController =
-                      TextEditingController(text: event?.event.name ?? ''),
-                  startDate = event?.event.startDate,
-                  endDate = event?.event.endDate,
-                  for (var group in event?.groups ?? [])
+                  event = EventAllDataModel.fromJson(jsonDecode(value)),
+                  if (event != null)
                     {
-                      selectedGroups.add(group.iD),
+                      eventIdController =
+                          TextEditingController(text: event?.event.iD ?? ''),
+                      eventNameController =
+                          TextEditingController(text: event?.event.name ?? ''),
+                      startDate = event?.event.startDate,
+                      endDate = event?.event.endDate,
+                      for (var venue in event?.venues ?? [])
+                        {
+                          selectedVenues.add(venue.iD),
+                        },
+                      for (var group in event?.groups ?? [])
+                        {
+                          selectedGroups.add(group.iD),
+                        },
                     },
-                  for (var group in event?.groups ?? [])
-                    {
-                      selectedGroups.add(group.iD),
-                    },
-                },
-              setState(() {}),
-            }
-        });
+                  setState(() {}),
+                }
+            });
   }
 
   void _fetchVenuesGroups() {
@@ -134,7 +128,7 @@ class EventFormState extends State<EventForm> {
               _buildTextFormField('Event Name', eventNameController, true),
               // Enable for both editing and creating
               const SizedBox(height: 12),
-              _buildDateRangeSelectionButton('Start Date and End Date '),
+              _buildDateRangeSelectionButton(),
               const SizedBox(height: 12),
               _buildVenueSelectionButton(),
               const SizedBox(height: 12),
@@ -144,7 +138,7 @@ class EventFormState extends State<EventForm> {
               const SizedBox(height: 12),
               _buildSelectedGroupsText(),
               const SizedBox(height: 24),
-              _buildSaveEventButton(),
+              _buildSaveEventButton(isEditing),
             ],
           ),
         ),
@@ -171,14 +165,13 @@ class EventFormState extends State<EventForm> {
     );
   }
 
-  Widget _buildDateRangeSelectionButton(String label) {
+  Widget _buildDateRangeSelectionButton() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ElevatedButton(
           onPressed: () async {
             final initialStartDate = startDate ?? DateTime.now();
-            final initialEndDate = endDate ?? initialStartDate;
 
             DateTime? pickedStartDate = await showDatePicker(
               context: context,
@@ -194,43 +187,51 @@ class EventFormState extends State<EventForm> {
               );
 
               if (pickedStartTime != null && mounted) {
-                DateTime? pickedEndDate = await showDatePicker(
-                  context: context,
-                  initialDate: initialEndDate,
-                  firstDate: DateTime(2024),
-                  lastDate: DateTime(2100),
-                );
-
-                if (pickedEndDate != null && mounted) {
-                  TimeOfDay? pickedEndTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.fromDateTime(pickedEndDate),
+                setState(() {
+                  startDate = DateTime(
+                    pickedStartDate.year,
+                    pickedStartDate.month,
+                    pickedStartDate.day,
+                    pickedStartTime.hour,
+                    pickedStartTime.minute,
                   );
-
-                  if (pickedEndTime != null) {
-                    setState(() {
-                      startDate = DateTime(
-                        pickedStartDate.year,
-                        pickedStartDate.month,
-                        pickedStartDate.day,
-                        pickedStartTime.hour,
-                        pickedStartTime.minute,
-                      );
-                      endDate = DateTime(
-                        pickedEndDate.year,
-                        pickedEndDate.month,
-                        pickedEndDate.day,
-                        pickedEndTime.hour,
-                        pickedEndTime.minute,
-                      );
-                    });
-                  }
-                }
+                });
               }
             }
           },
-          child: Text(
-              '$label: ${_formatDateTime(startDate)} - ${_formatDateTime(endDate)}'),
+          child: Text('Start Date: ${_formatDateTime(startDate)}'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final initialEndDate = endDate ?? DateTime.now();
+
+            DateTime? pickedEndDate = await showDatePicker(
+              context: context,
+              initialDate: initialEndDate,
+              firstDate: DateTime(2024),
+              lastDate: DateTime(2100),
+            );
+
+            if (pickedEndDate != null && mounted) {
+              TimeOfDay? pickedEndTime = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.fromDateTime(pickedEndDate),
+              );
+
+              if (pickedEndTime != null) {
+                setState(() {
+                  endDate = DateTime(
+                    pickedEndDate.year,
+                    pickedEndDate.month,
+                    pickedEndDate.day,
+                    pickedEndTime.hour,
+                    pickedEndTime.minute,
+                  );
+                });
+              }
+            }
+          },
+          child: Text('End Date: ${_formatDateTime(endDate)}'),
         ),
       ],
     );
@@ -253,10 +254,10 @@ class EventFormState extends State<EventForm> {
     return Text('Selected Groups: ${selectedGroups.length}');
   }
 
-  Widget _buildSaveEventButton() {
+  Widget _buildSaveEventButton(bool isEditing) {
     return ElevatedButton(
       onPressed: () {
-        _saveEvent();
+        _saveEvent(isEditing);
       },
       child: const Text('Save Event'),
     );
@@ -288,13 +289,13 @@ class EventFormState extends State<EventForm> {
                                 final venue = venues[index];
                                 return CheckboxListTile(
                                   title: Text(venue.name),
-                                  value: selectedVenues.contains(venue.iD),
+                                  value: selectedVenues.contains(venue.id),
                                   onChanged: (bool? value) {
                                     setState(() {
                                       if (value != null && value) {
-                                        selectedVenues.add(venue.iD);
+                                        selectedVenues.add(venue.id);
                                       } else {
-                                        selectedVenues.remove(venue.iD);
+                                        selectedVenues.remove(venue.id);
                                       }
                                     });
                                   },
@@ -422,25 +423,52 @@ class EventFormState extends State<EventForm> {
     );
   }
 
-  void _saveEvent() {
+  void _saveEvent(bool isEditing) {
     if (eventIdController.text.isEmpty || eventNameController.text.isEmpty) {
       return;
     }
 
-    String eventID = eventIdController.text;
-    String eventName = eventNameController.text;
-    DateTime? startEventDate = startDate;
-    DateTime? endEventDate = endDate;
-    List venue = selectedVenues;
 
-    if (kDebugMode) {
-      print(eventID);
-      print(eventName);
-      print(startEventDate);
-      print(endEventDate);
-      print(venue);
+    if(!isEditing) {
+      Map<String, dynamic> data = {
+        "id": eventIdController.text,
+        "name": eventNameController.text,
+        "startDate": startDate?.toIso8601String(),
+        "endDate": endDate?.toIso8601String(),
+        "venues": selectedVenues,
+        "groups": selectedGroups,
+      };
+      APIService.doPostInsert(
+          context: context, data: data, path: "/admin/event/add-event")
+          .then(
+            (value) =>
+        {
+          if (value == 201)
+            {
+              context.pop(),
+            }
+        },
+      );
     }
-
-    context.pop();
+    else{
+      Map<String, dynamic> data = {
+        "name": eventNameController.text,
+        "startDate": startDate?.toIso8601String(),
+        "endDate": endDate?.toIso8601String(),
+        "venues": selectedVenues,
+        "groups": selectedGroups,
+      };
+      APIService.doPut(
+          context: context, data: data, path: "/admin/event/update-event",param: eventIdController.text)
+          .then(
+            (value) =>
+        {
+          if (value == 201)
+            {
+              context.pop(),
+            }
+        },
+      );
+    }
   }
 }

@@ -71,7 +71,7 @@ void onStart(ServiceInstance service) {
     if (service is AndroidServiceInstance) {
       flutterLocalNotificationsPlugin.show(
         notificationId,
-        'Geolocation',
+        'Geolocation', //TODO Parinaz see what to put in notification
         'Don\'t Close ${DateTime.now()}',
         const NotificationDetails(
           android: AndroidNotificationDetails(

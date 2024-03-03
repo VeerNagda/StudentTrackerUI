@@ -113,14 +113,4 @@ class _AttendancePageState extends State<AttendancePage> {
   }
 }
 
-/*
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  final cameras = await availableCameras();
-  runApp(
-    MaterialApp(
-      home: AttendancePage(cameras: cameras),
-    ),
-  );
-}
-*/
+
