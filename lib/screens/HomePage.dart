@@ -1,14 +1,41 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ui/models/user/user_response_model.dart';
+import 'package:ui/services/api_service.dart';
 import '../services/shared_service.dart';
 
 import 'AttendancePage.dart';
 
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  UserResponseModel? user;
+  @override
+  void initState() {
+    super.initState();
+    if(SharedService.networkConnected){
+      APIService.doGet(
+          path: "/user/single-user",
+          param: SharedService.sapId)
+          .then((value) => {
+        user = UserResponseModel.fromJson(
+            jsonDecode(value)),
+        SharedService.setUserDetails(
+            user!),
+      });
+    }
+    
+  }
+  
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -47,14 +74,7 @@ class HomePage extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            UserDetails(
-              //have put random value for now
-              sapId: '12345678910',
-              firstName: 'Parinaz',
-              lastName: 'Bharucha',
-              className: 'BSC IT',
-              rollNumber: 'A000',
-            ),
+            UserDetails(),
             const AttendancePage(),
 
           ],
@@ -63,13 +83,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget UserDetails({
-    required String sapId,
-    required String firstName,
-    required String lastName,
-    required String className,
-    required String rollNumber,
-  }) {
+  Widget UserDetails() {
     return Scaffold(
       appBar: AppBar(
         //this will by default remove the arrow we get
@@ -81,11 +95,13 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetail('SAP ID', sapId),
-            _buildDetail('First Name', firstName),
-            _buildDetail('Last Name', lastName),
-            _buildDetail('Class', className),
-            _buildDetail('Roll Number', rollNumber),
+            //TODO set state configuration
+            _buildDetail('SAP ID', SharedService.prefs.getString("sapId")!),
+            _buildDetail('First Name', SharedService.prefs.getString("fName")!),
+            _buildDetail('Last Name', SharedService.prefs.getString("lName")!),
+            _buildDetail('Roll Number', SharedService.prefs.getString("roll_no")!),
+            _buildDetail('Phone', SharedService.prefs.getString("phone")!),
+            _buildDetail('Email', SharedService.prefs.getString("email")!),
           ],
         ),
       ),

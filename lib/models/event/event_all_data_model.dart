@@ -46,16 +46,16 @@ class Event {
   Event.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
     name = json['Name'];
-    startDate = DateTime.parse(json['Start_Date']);
-    endDate= DateTime.parse(json['End_Date']);
+    startDate = DateTime.parse(json['Start_Date']).toLocal();
+    endDate= DateTime.parse(json['End_Date']).toLocal();
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['ID'] = iD;
     data['Name'] = name;
-    data['Start_Date'] = startDate.toIso8601String();
-    data['End_Date'] = endDate.toIso8601String();
+    data['Start_Date'] = startDate.toString();
+    data['End_Date'] = endDate.toString();
     return data;
   }
 }

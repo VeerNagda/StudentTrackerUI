@@ -96,7 +96,7 @@ class APIService {
 
   static Future<String> doGet(
       {required String path,
-      Map<String, String>? query,
+        String? param,
       bool inValidateCache = false}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     Map<String, String> requestHeaders = {
@@ -106,12 +106,13 @@ class APIService {
     if (inValidateCache) {
       requestHeaders['Cache-Control'] = 'no-cache';
     }
-    Uri url;
-    if (query == null) {
-      url = Uri.http(Constants.baseUri, "/api$path", query);
-    } else {
-      url = Uri.http(Constants.baseUri, "/api$path", query);
+     Uri url;
+    if(param == null) {
+      url = Uri.http(Constants.baseUri, "/api$path");
+    } else{
+      url = Uri.http(Constants.baseUri, "/api$path/$param");
     }
+
     var response = await client.get(url, headers: requestHeaders);
     if (response.statusCode == 200) {
       return response.body;

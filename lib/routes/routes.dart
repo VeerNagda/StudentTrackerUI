@@ -54,7 +54,7 @@ class RouteConfig {
               GoRoute(
                 path: "single-user",
                 name:"single-user",
-                builder: (context,state) => const AddSingleUserPage(),
+                builder: (context,state) => AddSingleUserPage(sapId: state.uri.queryParameters["sapId"]),
               ),
               GoRoute(
                 path: "bulk-user",

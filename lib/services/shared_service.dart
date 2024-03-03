@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:ui/models/user/user_response_model.dart';
 import '../models/login/login_response_model.dart';
 
 class SharedService {
@@ -47,6 +48,13 @@ class SharedService {
     role=model.role;
     sapId = sap ;
   }
+  static void setUserDetails(UserResponseModel user) {
+    SharedService.prefs.setString("fName", user.fName);
+    SharedService.prefs.setString("lName", user.lName);
+    SharedService.prefs.setString("phone", user.phone);
+    SharedService.prefs.setString("email", user.email);
+    SharedService.prefs.setString("roll_no", user.rollNo);
+  }
 
 
   Future<bool> checkLocationService() async {
@@ -76,6 +84,8 @@ class SharedService {
       return false;
     }
   }
+
+
 
 
   static Future<void> logout(BuildContext context) async {

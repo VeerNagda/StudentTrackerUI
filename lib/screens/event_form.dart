@@ -35,8 +35,7 @@ class EventFormState extends State<EventForm> {
   // for venue pop up
 
   void _fetchEventData() {
-    var eventId = widget.eventId;
-    APIService.doGet(path: "/admin/event/event-details/$eventId")
+    APIService.doGet(path: "/admin/event/event-details", param: widget.eventId)
         .then((value) => {
               if (value != "")
                 {
@@ -438,6 +437,7 @@ class EventFormState extends State<EventForm> {
         "venues": selectedVenues,
         "groups": selectedGroups,
       };
+      print(data);
       APIService.doPostInsert(
           context: context, data: data, path: "/admin/event/add-event")
           .then(
@@ -453,11 +453,12 @@ class EventFormState extends State<EventForm> {
     else{
       Map<String, dynamic> data = {
         "name": eventNameController.text,
-        "startDate": startDate?.toIso8601String(),
-        "endDate": endDate?.toIso8601String(),
+        "startDate": startDate?.toString(),
+        "endDate": endDate?.toString(),
         "venues": selectedVenues,
         "groups": selectedGroups,
       };
+      print(data);
       APIService.doPut(
           context: context, data: data, path: "/admin/event/update-event",param: eventIdController.text)
           .then(

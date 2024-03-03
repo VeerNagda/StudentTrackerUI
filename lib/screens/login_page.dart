@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/models/login/login_request_model.dart';
 import 'package:ui/services/api_service.dart';
+import 'package:ui/services/shared_service.dart';
+import '../models/user/user_response_model.dart';
 import 'PasswordChangePage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,7 +17,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
-  final bool _rememberMe = false;
+  //final bool _rememberMe = false;
   late String _enteredSapId; // Declare variable to store entered SAP ID
   late String _enteredPassword; // Declare variable to store entered SAP ID
   bool isAPICallProcess = false;
@@ -29,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             //colors: [Color(0xFFe4efe9), Color(0xFF93a5cf)],
-           colors: [Color(0xFFcd9cf2), Color(0xFFf6f3ff)],
+            colors: [Color(0xFFcd9cf2), Color(0xFFf6f3ff)],
           ),
         ),
         child: Form(
@@ -73,7 +77,6 @@ class _LoginPageState extends State<LoginPage> {
                         hintText: 'Enter your SAP ID',
                         prefixIcon: Icon(Icons.person_outline),
                         border: OutlineInputBorder(),
-
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -143,8 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                     },
                     child: const Text(
                       "Forgot Password",
-                      style: TextStyle(
-                      ),
+                      style: TextStyle(),
                     ),
                   ),
                   _gap(),
@@ -160,11 +162,21 @@ class _LoginPageState extends State<LoginPage> {
                             });
                             LoginRequestModel model = LoginRequestModel(
                                 _enteredSapId, _enteredPassword);
+                            UserResponseModel user;
                             APIService.login(context, model).then((value) => {
                                   if (value == 0)
                                     {context.goNamed('admin')}
                                   else if (value == 1)
-                                    {context.goNamed("home")}
+                                    APIService.doGet(
+                                            path: "/user/single-user",
+                                            param: SharedService.sapId)
+                                        .then((value) => {
+                                              user = UserResponseModel.fromJson(
+                                                  jsonDecode(value)),
+                                              SharedService.setUserDetails(
+                                                  user),
+                                            }),
+                                  {context.goNamed("home")}
                                 });
                           }
                         },
@@ -184,7 +196,6 @@ class _LoginPageState extends State<LoginPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-
                             ),
                           ),
                         ),

@@ -18,8 +18,8 @@ class EventResponseModel {
   EventResponseModel.fromJson(Map<String, dynamic> json) {
     eventID = json['Event_ID'];
     eventName = json['Event_Name'];
-    startDate = DateTime.parse(json['Start_Date']);
-    endDate = DateTime.parse(json['End_Date']);
+    startDate = DateTime.parse(json['Start_Date']).toLocal();
+    endDate = DateTime.parse(json['End_Date']).toLocal();
     if (json['Venue'] != null) {
       venue = [];
       json['Venue'].forEach((v) {

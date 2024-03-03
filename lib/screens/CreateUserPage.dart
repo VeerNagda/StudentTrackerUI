@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
@@ -10,10 +13,10 @@ class CreateUserPage extends StatefulWidget {
   const CreateUserPage({super.key});
 
   @override
-  _CreateUserPageState createState() => _CreateUserPageState();
+  CreateUserPageState createState() => CreateUserPageState();
 }
 
-class _CreateUserPageState extends State<CreateUserPage> {
+class CreateUserPageState extends State<CreateUserPage> {
   late List<UserResponseModel> users = [];
   late Map<String, bool> userSelectionMap = {};
   bool selectAll = false;
@@ -137,7 +140,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
                     title: const Text('Add Bulk Users'),
                     onTap: () {
                       context.pop();
-                      _showAddBulkUsersDialog(context);
+                      _showAddBulkUsersDialog();
                     },
                   ),
                 ],
@@ -150,7 +153,6 @@ class _CreateUserPageState extends State<CreateUserPage> {
       ),
     );
   }
-
 
 // Delete icon for
   List<Widget> _buildAppBarActions() {
@@ -174,7 +176,8 @@ class _CreateUserPageState extends State<CreateUserPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Selected Users'),
-          content: const Text('Are you sure you want to delete all the selected users?'),
+          content: const Text(
+              'Are you sure you want to delete all the selected users?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -195,13 +198,11 @@ class _CreateUserPageState extends State<CreateUserPage> {
     );
   }
 
-
   void _removeSelectedUsers() {
     List<String> selectedUserIDs = userSelectionMap.entries
         .where((entry) => entry.value)
         .map((entry) => entry.key)
         .toList();
-
 
     setState(() {
       users.removeWhere((user) => selectedUserIDs.contains(user.iD));
@@ -227,8 +228,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
     });
   }
 
-
-  void _showAddBulkUsersDialog(BuildContext context) {
+  void _showAddBulkUsersDialog() {
+    Uint8List? uploadFileData;
+    String tip = 'Select CSV File';
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -240,21 +242,26 @@ class _CreateUserPageState extends State<CreateUserPage> {
               const Text('Select a CSV file to add users in bulk.'),
               ElevatedButton(
                 onPressed: () async {
-                  FilePickerResult? result = await FilePicker.platform.pickFiles(
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowedExtensions: ['csv'],
                   );
-
                   if (result != null) {
-                    PlatformFile file = result.files.first;
-                    print(file.name);
-                    print(file.bytes);
-                    print(file.size);
-                    print(file.extension);
-                    print(file.path);
-                  } else {}
+                    setState(() {
+                      tip = result.files.single.name;
+                    });
+                    if (kIsWeb) {
+                      uploadFileData = result.files.single.bytes;
+                    } else {
+                      File? file = File(result.files.single.path!);
+                      uploadFileData = file.readAsBytesSync();
+                    }
+                  } else {
+                    // User canceled the picker
+                  }
                 },
-                child: const Text('Select CSV File'),
+                child: Text(tip),
               ),
             ],
           ),
@@ -269,6 +276,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
               onPressed: () {
                 // TODO Handle the CSV file and add users
                 context.pop();
+                if (kIsWeb) {
+                  _saveMultipleStudents(uploadFileData!);
+                }
               },
               child: const Text('Add'),
             ),
@@ -280,11 +290,11 @@ class _CreateUserPageState extends State<CreateUserPage> {
 
   void _fetchAllUsers() {
     APIService.doGet(path: "/admin/user/all-users").then(
-          (value) => {
+      (value) => {
         if (value != "")
           {
             setState(
-                  () {
+              () {
                 users = jsonDecode(value)
                     .map<UserResponseModel>(
                         (item) => UserResponseModel.fromJson(item))
@@ -297,9 +307,26 @@ class _CreateUserPageState extends State<CreateUserPage> {
     );
   }
 
-  //TODO edit functionality
+  Future<void> _saveMultipleStudents(Uint8List file) async {
+    int response = await APIService.doMultipartCsvPost(
+        path: "/admin/user/create-multiple-user",
+        fileBytes: file,
+        fileName: 'createUsers');
+    if (response == 200 && mounted) {
+      context.pop();
+    } else {
+      if (kDebugMode) {
+        print(response);
+      }
+    }
+  }
+
   void _editUser(UserResponseModel user) {
-    context.goNamed('single-user');
+    context.pushNamed('single-user', queryParameters: {
+      "sapId": user.iD,
+    }).then((value) => {
+          _fetchAllUsers(),
+        });
   }
 
   void _deleteUser(UserResponseModel user) {
@@ -336,7 +363,6 @@ class _CreateUserPageState extends State<CreateUserPage> {
       userSelectionMap.remove(user.iD);
     });
 
-
     //TODO check
     /* APIService.doDeleteUser(user.iD).then((success) {
       if (success) {
@@ -351,7 +377,5 @@ class _CreateUserPageState extends State<CreateUserPage> {
         ));
       }
     }); */
-
   }
-
 }
