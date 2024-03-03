@@ -116,7 +116,7 @@ class EventFormState extends State<EventForm> {
       appBar: AppBar(
         title: const Text('Event Form'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           child: Column(
