@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -228,6 +227,7 @@ class CreateUserPageState extends State<CreateUserPage> {
     });
   }
 
+
   void _showAddBulkUsersDialog() {
     Uint8List? uploadFileData;
     String tip = 'Select CSV File';
@@ -275,10 +275,12 @@ class CreateUserPageState extends State<CreateUserPage> {
             TextButton(
               onPressed: () {
                 // TODO Handle the CSV file and add users
-                context.pop();
-                if (kIsWeb) {
+                  if (kDebugMode) {
+                    print("upload");
+                  }
                   _saveMultipleStudents(uploadFileData!);
-                }
+
+                context.pop();
               },
               child: const Text('Add'),
             ),
@@ -313,6 +315,9 @@ class CreateUserPageState extends State<CreateUserPage> {
         fileBytes: file,
         fileName: 'createUsers');
     if (response == 200 && mounted) {
+      setState(() {
+        _fetchAllUsers();
+      });
       context.pop();
     } else {
       if (kDebugMode) {

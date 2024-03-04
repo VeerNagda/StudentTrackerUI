@@ -96,12 +96,12 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //TODO set state configuration
-            _buildDetail('SAP ID', SharedService.prefs.getString("sapId")!),
-            _buildDetail('First Name', SharedService.prefs.getString("fName")!),
-            _buildDetail('Last Name', SharedService.prefs.getString("lName")!),
-            _buildDetail('Roll Number', SharedService.prefs.getString("roll_no")!),
-            _buildDetail('Phone', SharedService.prefs.getString("phone")!),
-            _buildDetail('Email', SharedService.prefs.getString("email")!),
+            _buildDetail('SAP ID', SharedService.prefs.getString("sapId")??""),
+            _buildDetail('First Name', SharedService.prefs.getString("fName")??""),
+            _buildDetail('Last Name', SharedService.prefs.getString("lName")??""),
+            _buildDetail('Roll Number', SharedService.prefs.getString("roll_no") ??""),
+            _buildDetail('Phone', SharedService.prefs.getString("phone") ?? ""),
+            _buildDetail('Email', SharedService.prefs.getString("email") ?? ""),
           ],
         ),
       ),
