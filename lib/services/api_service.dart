@@ -142,8 +142,7 @@ class APIService {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
 
     request.headers['Authorization'] = 'Bearer ${loginData!.accessToken}';
-    var permission = await Geolocator.checkPermission();
-    print(permission);
+    await Geolocator.checkPermission();
     Geolocator.requestPermission();
     Position position = await LocationService.getCurrentPosition();
     String coordinates = "${position.latitude} ${position.longitude}";

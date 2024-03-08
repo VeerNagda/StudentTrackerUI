@@ -315,9 +315,8 @@ class _GroupPageState extends State<GroupPage> {
                   _saveSingleStudent(sapId, group);
                 }
                 if (selectedValue == 1) {
-                  if(kIsWeb) {
                     _saveMultipleStudents(uploadFileData!, group);
-                  }
+
                 }
               },
               child: const Text('OK'),
@@ -348,6 +347,9 @@ class _GroupPageState extends State<GroupPage> {
     int response = await APIService.doMultipartCsvPost(
         path: "/admin/group/assign-multiple-user/$groupId", fileBytes: file, fileName: 'assign-multiple-user');
     if (response == 200 && mounted) {
+      setState(() {
+        _fetchGroups();
+      });
       context.pop();
     } else {
       if (kDebugMode) {
