@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                           });
                         },
                       ),
-                      //TODO add remember me functionality
+
                       const Text('Remember me'),
                     ],
                   ),

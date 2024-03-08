@@ -1,15 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'dart:typed_data';
+import 'package:flutter_pagination/flutter_pagination.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pagination/widgets/button_styles.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:ui/models/user/user_response_model.dart';
 import 'package:ui/services/api_service.dart';
 
 class CreateUserPage extends StatefulWidget {
-  const CreateUserPage({super.key});
+  const CreateUserPage({Key? key});
 
   @override
   CreateUserPageState createState() => CreateUserPageState();
@@ -18,7 +20,15 @@ class CreateUserPage extends StatefulWidget {
 class CreateUserPageState extends State<CreateUserPage> {
   late List<UserResponseModel> users = [];
   late Map<String, bool> userSelectionMap = {};
+  int itemsPerPage = 25;
+  int totalItems = 100;
   bool selectAll = false;
+  int page = 1;
+  bool isSearching = false;
+  String searchQuery = '';
+
+  bool sortAscending = true;
+  int sortColumnIndex = 0;
 
   @override
   void initState() {
@@ -48,70 +58,246 @@ class CreateUserPageState extends State<CreateUserPage> {
               const SizedBox(height: 20),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: [
-                    DataColumn(
-                      label: Row(
-                        children: [
-                          Checkbox(
-                            value: selectAll,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                selectAll = value ?? false;
-                                userSelectionMap.forEach((key, _) {
-                                  userSelectionMap[key] = selectAll;
-                                });
-                              });
-                            },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DataTable(
+                      columns: [
+
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              Text('SAP ID'),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    sortColumnIndex = 1;
+                                    sortAscending = !sortAscending;
+                                    _sortUsersByColumn('iD');
+                                  });
+                                },
+                                child: Icon(
+                                  sortColumnIndex == 1
+                                      ? sortAscending
+                                      ? Icons.arrow_drop_up
+                                      : Icons.arrow_drop_down
+                                      : Icons.arrow_drop_down_outlined,
+                                ),
+                              ),
+                            ],
                           ),
-                          const Text('Select All'),
-                        ],
-                      ),
+                        ),
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              const Text('First Name'),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    sortColumnIndex = 1;
+                                    sortAscending = !sortAscending;
+                                    _sortUsersByColumn('fName');
+                                  });
+                                },
+                                child: Icon(
+                                  sortColumnIndex == 1
+                                      ? sortAscending
+                                      ? Icons.arrow_drop_up
+                                      : Icons.arrow_drop_down
+                                      : Icons.arrow_drop_down_outlined,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              const Text('Last Name'),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    sortColumnIndex = 1;
+                                    sortAscending = !sortAscending;
+                                    _sortUsersByColumn('lName');
+                                  });
+                                },
+                                child: Icon(
+                                  sortColumnIndex == 1
+                                      ? sortAscending
+                                      ? Icons.arrow_drop_up
+                                      : Icons.arrow_drop_down
+                                      : Icons.arrow_drop_down_outlined,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              const Text('Roll No'),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    sortColumnIndex = 1;
+                                    sortAscending = !sortAscending;
+                                    _sortUsersByColumn('rollNo');
+                                  });
+                                },
+                                child: Icon(
+                                  sortColumnIndex == 1
+                                      ? sortAscending
+                                      ? Icons.arrow_drop_up
+                                      : Icons.arrow_drop_down
+                                      : Icons.arrow_drop_down_outlined,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              const Text('Phone No'),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    sortColumnIndex = 1;
+                                    sortAscending = !sortAscending;
+                                    _sortUsersByColumn('phone');
+                                  });
+                                },
+                                child: Icon(
+                                  sortColumnIndex == 1
+                                      ? sortAscending
+                                      ? Icons.arrow_drop_up
+                                      : Icons.arrow_drop_down
+                                      : Icons.arrow_drop_down_outlined,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              const Text('Email ID'),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    sortColumnIndex = 1;
+                                    sortAscending = !sortAscending;
+                                    _sortUsersByColumn('email');
+                                  });
+                                },
+                                child: Icon(
+                                  sortColumnIndex == 1
+                                      ? sortAscending
+                                      ? Icons.arrow_drop_up
+                                      : Icons.arrow_drop_down
+                                      : Icons.arrow_drop_down_outlined,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        DataColumn(
+                          label: Row(
+                            children: [
+                              const Text('Role'),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    sortColumnIndex = 1;
+                                    sortAscending = !sortAscending;
+                                    _sortUsersByColumn('role');
+                                  });
+                                },
+                                child: Icon(
+                                  sortColumnIndex == 1
+                                      ? sortAscending
+                                      ? Icons.arrow_drop_up
+                                      : Icons.arrow_drop_down
+                                      : Icons.arrow_drop_down_outlined,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const DataColumn(label: Text('Edit')),
+                      ],
+                      //search functioning
+                      rows: users
+                          .where((user) =>
+                      user.fName.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                          user.lName.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                          user.iD.toLowerCase().contains(searchQuery.toLowerCase()))
+                          .skip((page - 1) * itemsPerPage)
+                          .take(itemsPerPage)
+                          .map((user) {
+                        return DataRow(cells: [
+
+                          DataCell(Text(user.iD)),
+                          DataCell(Text(user.fName)),
+                          DataCell(Text(user.lName)),
+                          DataCell(Text(user.rollNo)),
+                          DataCell(Text(user.phone)),
+                          DataCell(Text(user.email)),
+                          DataCell(Text(user.role.toString())),
+                          DataCell(Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  _editUser(user);
+                                },
+                              ),
+
+                            ],
+                          )),
+                        ]);
+                      }).toList(),
                     ),
-                    const DataColumn(label: Text('SAP ID')),
-                    const DataColumn(label: Text('First Name')),
-                    const DataColumn(label: Text('Last Name')),
-                    const DataColumn(label: Text('Roll No')),
-                    const DataColumn(label: Text('Phone No')),
-                    const DataColumn(label: Text('Email ID')),
-                    const DataColumn(label: Text('Role')),
-                    const DataColumn(label: Text('Edit/Delete')),
+                    const SizedBox(height: 20),
+                    Pagination(
+                      totalPage: totalItems ~/ itemsPerPage,
+                      onPageChange: (int page) {
+                        setState(() {
+                          this.page = page;
+                        });
+                        _fetchAllUsers();
+                      },
+                      currentPage: page,
+                      paginateButtonStyles: PaginateButtonStyles(
+                        backgroundColor: Colors.transparent,
+
+                        textStyle: const TextStyle(
+                          color: Colors.purple,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      prevButtonStyles: PaginateSkipButton(
+                        buttonBackgroundColor: Colors.transparent,
+                        icon: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      nextButtonStyles: PaginateSkipButton(
+                        buttonBackgroundColor: Colors.transparent,
+                        icon: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      show: 1,
+                    )
+
+
+
                   ],
-                  rows: users.map((user) {
-                    return DataRow(cells: [
-                      DataCell(Checkbox(
-                        value: userSelectionMap[user.iD] ?? false,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            userSelectionMap[user.iD] = value ?? false;
-                          });
-                        },
-                      )),
-                      DataCell(Text(user.iD)),
-                      DataCell(Text(user.fName)),
-                      DataCell(Text(user.lName)),
-                      DataCell(Text(user.rollNo)),
-                      DataCell(Text(user.phone)),
-                      DataCell(Text(user.email)),
-                      DataCell(Text(user.role.toString())),
-                      DataCell(Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              _editUser(user);
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              _deleteUser(user);
-                            },
-                          ),
-                        ],
-                      )),
-                    ]);
-                  }).toList(),
                 ),
               ),
             ],
@@ -153,21 +339,111 @@ class CreateUserPageState extends State<CreateUserPage> {
     );
   }
 
-// Delete icon for
   List<Widget> _buildAppBarActions() {
-    if (selectAll) {
-      return [
-        IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () {
-            _deleteSelectedUsers();
-          },
+    return [
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: () {
+          setState(() {
+            isSearching = !isSearching;
+            if (!isSearching) {
+              searchQuery = '';
+            }
+          });
+        },
+      ),
+
+      if (isSearching)
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Stack(
+              alignment: Alignment.centerRight,
+              children: [
+                TextField(
+                  decoration: const InputDecoration(
+                    hintText: 'Search',
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      isSearching = false;
+                      searchQuery = '';
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
-      ];
-    } else {
-      return [];
+    ];
+  }
+
+
+  //sorting
+  void _sortUsersByColumn(String columnName) {
+    switch (columnName) {
+      case 'iD':
+        if (sortAscending) {
+          users.sort((a, b) => a.iD.compareTo(b.iD));
+        } else {
+          users.sort((a, b) => b.iD.compareTo(a.iD));
+        }
+        break;
+      case 'fName':
+        if (sortAscending) {
+          users.sort((a, b) => a.fName.compareTo(b.fName));
+        } else {
+          users.sort((a, b) => b.fName.compareTo(a.fName));
+        }
+        break;
+      case 'lName':
+        if (sortAscending) {
+          users.sort((a, b) => a.lName.compareTo(b.lName));
+        } else {
+          users.sort((a, b) => b.lName.compareTo(a.lName));
+        }
+        break;
+      case 'rollNo':
+        if (sortAscending) {
+          users.sort((a, b) => a.rollNo.compareTo(b.rollNo));
+        } else {
+          users.sort((a, b) => b.rollNo.compareTo(a.rollNo));
+        }
+        break;
+      case 'phone':
+        if (sortAscending) {
+          users.sort((a, b) => a.phone.compareTo(b.phone));
+        } else {
+          users.sort((a, b) => b.phone.compareTo(a.phone));
+        }
+        break;
+      case 'email':
+        if (sortAscending) {
+          users.sort((a, b) => a.email.compareTo(b.email));
+        } else {
+          users.sort((a, b) => b.email.compareTo(a.email));
+        }
+        break;
+      case 'role':
+        if (sortAscending) {
+          users.sort((a, b) => a.role.compareTo(b.role));
+        } else {
+          users.sort((a, b) => b.role.compareTo(a.role));
+        }
+
     }
   }
+
+
 
   void _deleteSelectedUsers() {
     showDialog(
@@ -175,8 +451,8 @@ class CreateUserPageState extends State<CreateUserPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Selected Users'),
-          content: const Text(
-              'Are you sure you want to delete all the selected users?'),
+          content:
+          const Text('Are you sure you want to delete all the selected users?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -227,7 +503,6 @@ class CreateUserPageState extends State<CreateUserPage> {
     });
   }
 
-
   void _showAddBulkUsersDialog() {
     Uint8List? uploadFileData;
     String tip = 'Select CSV File';
@@ -243,7 +518,7 @@ class CreateUserPageState extends State<CreateUserPage> {
               ElevatedButton(
                 onPressed: () async {
                   FilePickerResult? result =
-                      await FilePicker.platform.pickFiles(
+                  await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowedExtensions: ['csv'],
                   );
@@ -275,12 +550,10 @@ class CreateUserPageState extends State<CreateUserPage> {
             TextButton(
               onPressed: () {
                 // TODO Handle the CSV file and add users
-                  if (kDebugMode) {
-                    print("upload");
-                  }
-                  _saveMultipleStudents(uploadFileData!);
-
                 context.pop();
+                if (kIsWeb) {
+                  _saveMultipleStudents(uploadFileData!);
+                }
               },
               child: const Text('Add'),
             ),
@@ -292,16 +565,18 @@ class CreateUserPageState extends State<CreateUserPage> {
 
   void _fetchAllUsers() {
     APIService.doGet(path: "/admin/user/all-users").then(
-      (value) => {
+          (value) => {
         if (value != "")
           {
             setState(
-              () {
+                  () {
                 users = jsonDecode(value)
                     .map<UserResponseModel>(
                         (item) => UserResponseModel.fromJson(item))
                     .toList();
-                userSelectionMap = {for (var user in users) user.iD: false};
+                userSelectionMap = {
+                  for (var user in users) user.iD: false
+                };
               },
             )
           }
@@ -315,9 +590,6 @@ class CreateUserPageState extends State<CreateUserPage> {
         fileBytes: file,
         fileName: 'createUsers');
     if (response == 200 && mounted) {
-      setState(() {
-        _fetchAllUsers();
-      });
       context.pop();
     } else {
       if (kDebugMode) {
@@ -329,9 +601,7 @@ class CreateUserPageState extends State<CreateUserPage> {
   void _editUser(UserResponseModel user) {
     context.pushNamed('single-user', queryParameters: {
       "sapId": user.iD,
-    }).then((value) => {
-          _fetchAllUsers(),
-        });
+    }).then((value) => {_fetchAllUsers()});
   }
 
   void _deleteUser(UserResponseModel user) {
@@ -383,4 +653,42 @@ class CreateUserPageState extends State<CreateUserPage> {
       }
     }); */
   }
+
+  void _showSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Search Users'),
+          content: TextField(
+            onChanged: (value) {
+              setState(() {
+                searchQuery = value;
+              });
+            },
+            decoration: const InputDecoration(
+              hintText: 'Enter search query',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.pop();
+                // Perform search action here if needed
+              },
+              child: const Text('Search'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
+
+

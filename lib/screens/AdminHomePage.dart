@@ -28,7 +28,7 @@ class AdminHomePage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-                // TODO VEER
+
                 SharedService.prefs.remove("accessToken");
                 SharedService.prefs.remove("role");
                 SharedService.prefs.remove("sapId");
