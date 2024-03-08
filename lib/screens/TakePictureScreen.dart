@@ -90,6 +90,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     return XFile(tempFile.path);
   }
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +111,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           final screenRatio = screenH / screenW;
           final previewRatio = previewH / previewW;
           if (snapshot.connectionState == ConnectionState.done &&
-              _controller.value.isInitialized) {
+              _controller.value.isInitialized && !isLoading) {
             return Stack(
               children: [
                 /*Positioned(
@@ -148,6 +150,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          setState(() {
+            isLoading = true;
+          });
           try {
             await _initializeControllerFuture;
             XFile rawImage = await _controller.takePicture();
@@ -159,11 +164,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             if (response == 200) {
               /**/
               FlutterBackgroundService().startService();
-              setState(() {});
-              if (kDebugMode) {
-                print("sent data");
-              }
+              setState(() {
+                isLoading = false;
+              });
             }
+
             if (mounted) {
               context.goNamed("home");
             }

@@ -87,6 +87,7 @@ void onStart(ServiceInstance service) {
 
     if (DateTime.now().isAfter(eventEndTime!) &&
         LocationService.location!.timedCoordinates == []) {
+      print("cancel \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
       service.stopSelf();
     }
     service.invoke('update');
@@ -104,5 +105,5 @@ Future<void> setDetails() async {
   SharedService.prefs = await SharedPreferences.getInstance();
   sapId = SharedService.prefs.getString("sapId");
   eventId = SharedService.prefs.getString("eventId");
-  eventEndTime = DateTime.parse(SharedService.prefs.getString("eventEndTime")!);
+  eventEndTime = DateTime.parse(SharedService.prefs.getString("eventEndTime")!).toLocal();
 }
