@@ -17,7 +17,8 @@ Future<void> initializeService() async {
     'MY FOREGROUND SERVICE', // title
     description:
         'This channel is used for important notifications.', // description
-    importance: Importance.low, // importance must be at low or higher level
+    importance: Importance.high, // importance must be at low or higher level
+    playSound: false,
   );
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -36,7 +37,7 @@ Future<void> initializeService() async {
     ),
     androidConfiguration: AndroidConfiguration(
       onStart: onStart,
-      isForegroundMode: false,
+      isForegroundMode: true,
       autoStart: false,
       notificationChannelId: notificationChannelId,
       // this must match with notification channel you created above.
@@ -83,13 +84,12 @@ void onStart(ServiceInstance service) {
         ),
       );
     }
-    await LocationService.getPosition(sapId!, eventId!);
 
     if (DateTime.now().isAfter(eventEndTime!) &&
         LocationService.location!.timedCoordinates == []) {
-      print("cancel \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
       service.stopSelf();
-    }
+    }else{
+    await LocationService.getPosition(sapId!, eventId!);}
     service.invoke('update');
   });
 }
