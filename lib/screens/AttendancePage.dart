@@ -106,6 +106,9 @@ class _AttendancePageState extends State<AttendancePage> {
             "eventEndTime", SharedService.eventEndTime.toString());
         SharedService.prefs.setString("eventId", SharedService.eventId);
         context.pushNamed('verify-user');
+        setState(() {
+
+        });
       }
           : null,
       child: const Text('Click Photo'),

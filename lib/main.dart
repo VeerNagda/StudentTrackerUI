@@ -11,10 +11,11 @@ void main() async{
   }
   else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android) {
     await Permission.notification.isDenied.then((value) => {if(value){Permission.notification.request()}});
-    await Permission.camera.isDenied.then((value) => {if(value){Permission.notification.request()}});
-    await Permission.audio.isDenied.then((value) => {if(value){Permission.notification.request()}});
+    await Permission.camera.isDenied.then((value) => {if(value){Permission.camera.request()}});
+    //await Permission.audio.isDenied.then((value) => {if(value){Permission.audio.request()}});
     await Permission.location.isDenied.then((value) => {if(value){Permission.location.request()}});
     await Permission.locationAlways.isDenied.then((value) => {if(value){Permission.locationAlways.request()}});
+    await Permission.ignoreBatteryOptimizations.isDenied.then((value) => {if(value){Permission.ignoreBatteryOptimizations.request()}});
     await initializeService();
   }
 

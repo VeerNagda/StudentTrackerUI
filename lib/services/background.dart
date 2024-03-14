@@ -85,7 +85,8 @@ void onStart(ServiceInstance service) {
       );
     }
 
-    if (DateTime.now().isAfter(eventEndTime!) &&
+    var time = DateTime.now();
+    if (time.isAfter(eventEndTime!) &&
         LocationService.location!.timedCoordinates == []) {
       service.stopSelf();
     }else{
