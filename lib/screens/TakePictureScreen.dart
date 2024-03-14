@@ -170,7 +170,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             }
 
             if (mounted) {
-              context.goNamed("home");
+              context.pop();
             }
           } catch (e) {
             if (kDebugMode) {

@@ -140,7 +140,6 @@ class APIService {
     Uri url = Uri.http(Constants.baseUri, "/api$path/${SharedService.sapId}");
     var request = http.MultipartRequest('POST', url);
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
-
     request.headers['Authorization'] = 'Bearer ${loginData!.accessToken}';
     await Geolocator.checkPermission();
     Geolocator.requestPermission();
