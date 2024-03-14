@@ -31,6 +31,7 @@ class APIService {
       SharedService.setLoginDetails(
           loginResponseJson(response.body), model.sap);
       var role = SharedService.role;
+
       return role;
     } else if (response.statusCode == 401) {
       MessageModel messageModel = messageResponseJson(response.body);
@@ -202,4 +203,24 @@ class APIService {
     }
     return response.statusCode;
   }
+
+  static Future<Uint8List?> doGetCSV({required String path, required String param}) async {
+    LoginResponseModel? loginData = await SharedService.getLoginDetails();
+    Map<String, String> requestHeaders = {
+      'Authorization': 'Bearer ${loginData!.accessToken}',
+    };
+
+    Uri url = Uri.http(Constants.baseUri, "/api$path" + "/$param");
+    var response = await client.get(url, headers: requestHeaders);
+
+    if (response.statusCode == 200) {
+      return response.bodyBytes;
+    } else {
+      if (kDebugMode) {
+        print('Failed to fetch CSV file. Error: ${response.reasonPhrase}');
+      }
+      return null;
+    }
+  }
+
 }

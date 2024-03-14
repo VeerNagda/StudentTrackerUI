@@ -1,11 +1,31 @@
-import 'package:flutter/material.dart';
-import 'package:excel/excel.dart';
-import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
 import 'dart:io';
 
-class ReportAttendance extends StatelessWidget {
-  const ReportAttendance({Key? key});
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:excel/excel.dart';
+
+import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:ui/models/event/event_ended_model.dart';
+import 'package:ui/services/api_service.dart';
+
+class ReportAttendance extends StatefulWidget {
+  const ReportAttendance({Key? key}) : super(key: key);
+
+  @override
+  _ReportAttendanceState createState() => _ReportAttendanceState();
+}
+
+class _ReportAttendanceState extends State<ReportAttendance> {
+  late List<EventsEndedModel> events;
+  late Map<int, bool> userSelectionMap;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAllEventsEnded();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,37 +62,44 @@ class ReportAttendance extends StatelessWidget {
               ),
             ),
           ],
-          rows: const <DataRow>[
-            DataRow(
-              cells: <DataCell>[
-                DataCell(Text('123')),
-                DataCell(Text('YOLO')),
-                DataCell(Text('31st ')),
-                DataCell(DownloadButton()),
-              ],
-            ),
-            // Add more rows as needed
-          ],
+            rows: events.map((event) {
+              return DataRow(cells: [
+                DataCell(Text(event.iD)),
+                DataCell(Text(event.name)),
+                DataCell(Text(event.endDate.toString())),
+                DataCell(download(event)),
+              ]);
+            }).toList()
         ),
       ),
     );
   }
-}
 
-class DownloadButton extends StatelessWidget {
-  const DownloadButton({Key? key});
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.download),
-      onPressed: () {
-        _showConfirmationDialog(context);
+  void _fetchAllEventsEnded() {
+    APIService.doGet(path: "/admin/attendance/all-ended-events").then(
+          (value) {
+        if (value != "") {
+          setState(() {
+            events = jsonDecode(value)
+                .map<EventsEndedModel>((item) => EventsEndedModel.fromJson(item))
+                .toList();
+          });
+        }
       },
     );
   }
 
-  void _showConfirmationDialog(BuildContext context) {
+
+  Widget download(EventsEndedModel event) {
+    return IconButton(
+      icon: const Icon(Icons.download),
+      onPressed: () {
+        _showConfirmationDialog(context, event);
+      },
+    );
+  }
+
+  void _showConfirmationDialog(BuildContext context, EventsEndedModel event) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -82,7 +109,7 @@ class DownloadButton extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                _downloadFile(context);
+                _downloadFile(event);
                 context.pop();
               },
               child: const Text("Yes"),
@@ -99,7 +126,7 @@ class DownloadButton extends StatelessWidget {
     );
   }
 
-  void _downloadFile(BuildContext context) async {
+  /*void _downloadFile(BuildContext context) async {
     final Excel excel = Excel.createExcel();
     final Sheet sheet = excel['Sheet1'];
 
@@ -125,5 +152,20 @@ class DownloadButton extends StatelessWidget {
         content: Text('File downloaded to $path'),
       ),
     );
+  }*/
+
+
+  _downloadFile(EventsEndedModel event){
+    APIService.doGetCSV(path: "/admin/attendance/generate-attendance",param: event.iD).then((value) =>
+    {
+    if (value != null) {
+        //_saveFile(value, "attendance.csv"), TODO
   }
+    });
+  }
+
+
+
+
+
 }

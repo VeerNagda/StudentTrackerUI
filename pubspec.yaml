@@ -48,7 +48,7 @@ dependencies:
   flutter_background_service: ^2.4.6
   flutter_background_service_ios: ^2.4.0
   flutter_background_service_android: ^3.0.3
-  permission_handler: ^10.2.0
+  permission_handler: ^11.3.0
   flutter_local_notifications: ^13.0.0
   connectivity_plus: ^5.0.2
   get: 4.6.6
@@ -56,7 +56,9 @@ dependencies:
   flutter_pagination: ^0.0.8
   number_paginator: ^0.4.1
   excel: ^4.0.2
-
+  background_locator_2: ^2.0.6
+  open_file: ^3.1.2
+  flutter_document_picker: ^5.2.3
 
 
 

@@ -287,7 +287,7 @@ class CreateUserPageState extends State<CreateUserPage> {
                       ),
                       nextButtonStyles: PaginateSkipButton(
                         buttonBackgroundColor: Colors.transparent,
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.arrow_forward_ios,
                           color: Colors.purple,
                         ),
@@ -372,7 +372,7 @@ class CreateUserPageState extends State<CreateUserPage> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(Icons.clear),
+                  icon: const Icon(Icons.clear),
                   onPressed: () {
                     setState(() {
                       isSearching = false;
@@ -444,64 +444,6 @@ class CreateUserPageState extends State<CreateUserPage> {
   }
 
 
-
-  void _deleteSelectedUsers() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete Selected Users'),
-          content:
-          const Text('Are you sure you want to delete all the selected users?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                context.pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                _removeSelectedUsers();
-                context.pop();
-              },
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _removeSelectedUsers() {
-    List<String> selectedUserIDs = userSelectionMap.entries
-        .where((entry) => entry.value)
-        .map((entry) => entry.key)
-        .toList();
-
-    setState(() {
-      users.removeWhere((user) => selectedUserIDs.contains(user.iD));
-      selectedUserIDs.forEach((id) => userSelectionMap.remove(id));
-    });
-
-    selectedUserIDs.forEach((id) {
-      //TODO API
-      /*
-      APIService.doDeleteUser(id).then((success) {
-        if (success) {
-          // Show a snackbar or toast to indicate successful deletion
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Selected users deleted successfully.'),
-          ));
-        } else {
-          // Show a snackbar or toast to indicate failure
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Failed to delete selected users.'),
-          ));
-        }
-      }); */
-    });
-  }
 
   void _showAddBulkUsersDialog() {
     Uint8List? uploadFileData;
