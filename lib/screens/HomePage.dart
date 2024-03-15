@@ -9,7 +9,6 @@ import '../services/shared_service.dart';
 
 import 'AttendancePage.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -19,23 +18,36 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   UserResponseModel? user;
+
   @override
   void initState() {
     super.initState();
-    if(SharedService.networkConnected){
-      APIService.doGet(
-          path: "/user/single-user",
-          param: SharedService.sapId)
-          .then((value) => {
-        user = UserResponseModel.fromJson(
-            jsonDecode(value)),
-        SharedService.setUserDetails(
-            user!),
-      });
-    }
-    
+    _fetchData();
   }
-  
+
+  String sapId = "";
+  String fName = "";
+  String lName = "";
+  String roll = "";
+  String phone = "";
+  String email = "";
+
+  _fetchData() {
+    APIService.doGet(path: "/user/single-user", param: SharedService.sapId)
+        .then((value) => {
+              user = UserResponseModel.fromJson(jsonDecode(value)),
+              SharedService.setUserDetails(user!),
+              sapId = (SharedService.prefs.getString("sapId")) ?? "",
+              fName = user!.fName,
+              lName = user!.lName,
+              email = user!.email,
+              phone = user!.phone,
+              roll = user!.rollNo,
+              setState(() {})
+            });
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -76,7 +88,6 @@ class _HomePageState extends State<HomePage> {
           children: [
             UserDetails(),
             const AttendancePage(),
-
           ],
         ),
       ),
@@ -95,13 +106,12 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //TODO set state configuration
-            _buildDetail('SAP ID', SharedService.prefs.getString("sapId")??""),
-            _buildDetail('First Name', SharedService.prefs.getString("fName")??""),
-            _buildDetail('Last Name', SharedService.prefs.getString("lName")??""),
-            _buildDetail('Roll Number', SharedService.prefs.getString("roll_no") ??""),
-            _buildDetail('Phone', SharedService.prefs.getString("phone") ?? ""),
-            _buildDetail('Email', SharedService.prefs.getString("email") ?? ""),
+            _buildDetail('SAP ID', sapId),
+            _buildDetail('First Name', fName),
+            _buildDetail('Last Name', lName),
+            _buildDetail('Roll Number', roll),
+            _buildDetail('Phone', phone),
+            _buildDetail('Email', email),
           ],
         ),
       ),

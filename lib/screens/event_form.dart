@@ -399,7 +399,7 @@ class EventFormState extends State<EventForm> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              Navigator.pop(context, selectedGroups);
+                              context.pop();
                             },
                             child: const Text('Save'),
                           ),

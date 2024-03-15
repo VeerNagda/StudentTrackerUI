@@ -109,7 +109,7 @@ class _VenuesPageState extends State<VenuesPage> {
   }
 
   void _navigateToEditVenue(VenueResponseModel venue) async {
-    context.goNamed('add-venue');
+    context.pushNamed('add-venue');
   }
 
   void _handleEditVenue(VenueResponseModel editedVenue) {

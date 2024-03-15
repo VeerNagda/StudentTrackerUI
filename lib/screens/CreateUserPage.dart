@@ -493,9 +493,9 @@ class CreateUserPageState extends State<CreateUserPage> {
               onPressed: () {
                 // TODO Handle the CSV file and add users
                 context.pop();
-                if (kIsWeb) {
+
                   _saveMultipleStudents(uploadFileData!);
-                }
+
               },
               child: const Text('Add'),
             ),

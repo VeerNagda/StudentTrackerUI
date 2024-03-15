@@ -59,7 +59,8 @@ dependencies:
   background_locator_2: ^2.0.6
   open_file: ^3.1.2
   flutter_document_picker: ^5.2.3
-
+  csv: ^5.0.2
+  file_saver: ^0.2.8
 
 
 

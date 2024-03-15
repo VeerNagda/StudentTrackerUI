@@ -210,7 +210,7 @@ class APIService {
       'Authorization': 'Bearer ${loginData!.accessToken}',
     };
 
-    Uri url = Uri.http(Constants.baseUri, "/api$path" + "/$param");
+    Uri url = Uri.http(Constants.baseUri, "/api$path/$param");
     var response = await client.get(url, headers: requestHeaders);
 
     if (response.statusCode == 200) {

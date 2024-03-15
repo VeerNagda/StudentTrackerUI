@@ -3,10 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:excel/excel.dart';
-
-import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui/models/event/event_ended_model.dart';
 import 'package:ui/services/api_service.dart';
 
@@ -18,7 +17,7 @@ class ReportAttendance extends StatefulWidget {
 }
 
 class _ReportAttendanceState extends State<ReportAttendance> {
-  late List<EventsEndedModel> events;
+  late List<EventsEndedModel> events = [];
   late Map<int, bool> userSelectionMap;
 
   @override
@@ -36,32 +35,32 @@ class _ReportAttendanceState extends State<ReportAttendance> {
       body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          columns: const <DataColumn>[
-            DataColumn(
-              label: Text(
-                'Event ID',
-                style: TextStyle(fontStyle: FontStyle.italic),
+            columns: const <DataColumn>[
+              DataColumn(
+                label: Text(
+                  'Event ID',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
               ),
-            ),
-            DataColumn(
-              label: Text(
-                'Event Name',
-                style: TextStyle(fontStyle: FontStyle.italic),
+              DataColumn(
+                label: Text(
+                  'Event Name',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
               ),
-            ),
-            DataColumn(
-              label: Text(
-                'Event Date',
-                style: TextStyle(fontStyle: FontStyle.italic),
+              DataColumn(
+                label: Text(
+                  'Event Date',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
               ),
-            ),
-            DataColumn(
-              label: Text(
-                'Download',
-                style: TextStyle(fontStyle: FontStyle.italic),
+              DataColumn(
+                label: Text(
+                  'Download',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
               ),
-            ),
-          ],
+            ],
             rows: events.map((event) {
               return DataRow(cells: [
                 DataCell(Text(event.iD)),
@@ -69,26 +68,25 @@ class _ReportAttendanceState extends State<ReportAttendance> {
                 DataCell(Text(event.endDate.toString())),
                 DataCell(download(event)),
               ]);
-            }).toList()
-        ),
+            }).toList()),
       ),
     );
   }
 
   void _fetchAllEventsEnded() {
     APIService.doGet(path: "/admin/attendance/all-ended-events").then(
-          (value) {
+      (value) {
         if (value != "") {
           setState(() {
             events = jsonDecode(value)
-                .map<EventsEndedModel>((item) => EventsEndedModel.fromJson(item))
+                .map<EventsEndedModel>(
+                    (item) => EventsEndedModel.fromJson(item))
                 .toList();
           });
         }
       },
     );
   }
-
 
   Widget download(EventsEndedModel event) {
     return IconButton(
@@ -126,7 +124,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
     );
   }
 
-  /*void _downloadFile(BuildContext context) async {
+  /*void downloadFile(BuildContext context) async {
     final Excel excel = Excel.createExcel();
     final Sheet sheet = excel['Sheet1'];
 
@@ -154,18 +152,47 @@ class _ReportAttendanceState extends State<ReportAttendance> {
     );
   }*/
 
+  _downloadFile(EventsEndedModel event) async {
+    final externalPath = await getExternalStorageDirectory();
 
-  _downloadFile(EventsEndedModel event){
-    APIService.doGetCSV(path: "/admin/attendance/generate-attendance",param: event.iD).then((value) =>
-    {
-    if (value != null) {
-        //_saveFile(value, "attendance.csv"), TODO
+    String path;
+    APIService.doGetCSV(
+            path: "/admin/attendance/generate-attendance", param: event.iD)
+        .then(
+      (value) async => {
+        if (value != null)
+          {
+            path = 'your_file_name.extension',
+            // Specify the file name and extension
+
+            saveAndOpenUint8List(value, path)
+          }
+      },
+    );
   }
-    });
+
+  Future<void> openFile(String filePath) async {
+    // Launch the file using the default platform application
+    if (await canLaunch(filePath)) {
+      await launch(filePath);
+    } else {
+      throw 'Could not launch $filePath';
+    }
   }
 
+// Function to save Uint8List data to a file and open it
+  Future<void> saveAndOpenUint8List(Uint8List data, String fileName) async {
+    // Get the temporary directory using path_provider package
+    Directory tempDir = await getTemporaryDirectory();
+    String tempPath = tempDir.path;
 
+    // Create a File object with a temporary file path
+    File tempFile = File('$tempPath/$fileName');
 
+    // Write the bytes to the file
+    await tempFile.writeAsBytes(data);
 
-
+    // Open the file
+    await openFile(tempFile.path);
+  }
 }
