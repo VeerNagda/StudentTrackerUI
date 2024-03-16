@@ -38,11 +38,16 @@ Future<void> handlePermissions() async {
   if (!await Permission.storage.isGranted) {
     await Permission.storage.request();
   }
+  if (!await Permission.manageExternalStorage.isGranted) {
+    await Permission.manageExternalStorage.request();
+  }
+
   if (await Permission.location.isGranted &&
       await Permission.locationAlways.isGranted &&
       await Permission.camera.isGranted &&
       await Permission.notification.isGranted &&
-      await Permission.storage.isGranted) {
+      await Permission.storage.isGranted
+  ) {
     if (!await Permission.ignoreBatteryOptimizations.isGranted) {
       await Permission.ignoreBatteryOptimizations.request();
     }

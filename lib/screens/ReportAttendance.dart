@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
@@ -19,11 +21,13 @@ class ReportAttendance extends StatefulWidget {
 class _ReportAttendanceState extends State<ReportAttendance> {
   late List<EventsEndedModel> events = [];
   late Map<int, bool> userSelectionMap;
+  late final LocalStorage storage;
 
   @override
   void initState() {
     super.initState();
     _fetchAllEventsEnded();
+    storage = LocalStorage('UI');
   }
 
   @override
@@ -153,8 +157,7 @@ class _ReportAttendanceState extends State<ReportAttendance> {
   }*/
 
   _downloadFile(EventsEndedModel event) async {
-    final externalPath = await getExternalStorageDirectory();
-
+    Directory? downloadsDir;
     String path;
     APIService.doGetCSV(
             path: "/admin/attendance/generate-attendance", param: event.iD)
@@ -162,37 +165,46 @@ class _ReportAttendanceState extends State<ReportAttendance> {
       (value) async => {
         if (value != null)
           {
-            path = 'your_file_name.extension',
             // Specify the file name and extension
 
-            saveAndOpenUint8List(value, path)
+            downloadsDir = await getApplicationDocumentsDirectory(),
+            path = "${downloadsDir!.path}/attendance",
+            await FileSaver.instance.saveAs(
+              name: 'attendance.csv',
+              bytes: value,
+              filePath: path,
+              mimeType: MimeType.csv, ext: 'csv',
+            )
           }
       },
     );
   }
 
-  Future<void> openFile(String filePath) async {
-    // Launch the file using the default platform application
-    if (await canLaunch(filePath)) {
-      await launch(filePath);
-    } else {
-      throw 'Could not launch $filePath';
-    }
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+
+    return directory.path;
   }
 
-// Function to save Uint8List data to a file and open it
-  Future<void> saveAndOpenUint8List(Uint8List data, String fileName) async {
-    // Get the temporary directory using path_provider package
-    Directory tempDir = await getTemporaryDirectory();
-    String tempPath = tempDir.path;
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/attendance.csv');
+  }
 
-    // Create a File object with a temporary file path
-    File tempFile = File('$tempPath/$fileName');
+  Future<String> _saveFile(Uint8List csvData) async {
+    final Directory? downloadsDir;
+    if (kIsWeb) {
+      downloadsDir = await getDownloadsDirectory();
 
-    // Write the bytes to the file
-    await tempFile.writeAsBytes(data);
+      String path = "${downloadsDir!.path}attendance";
 
-    // Open the file
-    await openFile(tempFile.path);
+      return await FileSaver.instance.saveFile(
+        name: 'attendance.csv',
+        bytes: csvData,
+        filePath: path,
+        mimeType: MimeType.csv,
+      );
+    }
+    return "";
   }
 }
