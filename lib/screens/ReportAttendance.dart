@@ -6,13 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/models/event/event_ended_model.dart';
 import 'package:ui/services/api_service.dart';
 
 class ReportAttendance extends StatefulWidget {
-  const ReportAttendance({Key? key}) : super(key: key);
+  const ReportAttendance({super.key});
 
   @override
   _ReportAttendanceState createState() => _ReportAttendanceState();

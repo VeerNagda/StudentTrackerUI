@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 
@@ -23,11 +24,15 @@ class AuthenticationService {
         final String? accessToken = responseData['accessToken'];
         return accessToken;
       } else {
-        print('Failed to authenticate user. Status code: ${response.statusCode}');
+        if (kDebugMode) {
+          print('Failed to authenticate user. Status code: ${response.statusCode}');
+        }
         return null;
       }
     } catch (e) {
-      print('Exception while authenticating user: $e');
+      if (kDebugMode) {
+        print('Exception while authenticating user: $e');
+      }
       return null;
     }
   }

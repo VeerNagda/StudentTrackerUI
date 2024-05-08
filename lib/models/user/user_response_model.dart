@@ -9,12 +9,12 @@ class UserResponseModel {
 
   UserResponseModel(
       {required this.iD,
-        required this.rollNo,
-        required this.fName,
-        required this.lName,
-        required this.email,
-        required this.phone,
-        required this.role});
+      required this.rollNo,
+      required this.fName,
+      required this.lName,
+      required this.email,
+      required this.phone,
+      required this.role});
 
   UserResponseModel.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
@@ -22,7 +22,7 @@ class UserResponseModel {
     fName = json['FName'];
     lName = json['LName'];
     email = json['Email'];
-    phone = json['Phone'];
+    phone = json['Phone'] ?? "";
     role = json['Role'];
   }
 

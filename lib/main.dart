@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ui/routes/routes.dart';
 import 'package:ui/services/background.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +14,7 @@ void main() async {
     // Initialize services
     await handlePermissions();
     await initializeService();
+    tz.initializeTimeZones();
 
     // Handle permissions
   }
@@ -58,7 +60,7 @@ Future<void> handlePermissions() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

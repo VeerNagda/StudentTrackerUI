@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -437,7 +438,9 @@ class EventFormState extends State<EventForm> {
         "venues": selectedVenues,
         "groups": selectedGroups,
       };
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       APIService.doPostInsert(
           context: context, data: data, path: "/admin/event/add-event")
           .then(
@@ -458,7 +461,9 @@ class EventFormState extends State<EventForm> {
         "venues": selectedVenues,
         "groups": selectedGroups,
       };
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       APIService.doPut(
           context: context, data: data, path: "/admin/event/update-event",param: eventIdController.text)
           .then(

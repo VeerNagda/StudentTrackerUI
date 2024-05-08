@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter_pagination/flutter_pagination.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,7 @@ import 'package:ui/models/user/user_response_model.dart';
 import 'package:ui/services/api_service.dart';
 
 class CreateUserPage extends StatefulWidget {
-  const CreateUserPage({Key? key});
+  const CreateUserPage({super.key});
 
   @override
   CreateUserPageState createState() => CreateUserPageState();
@@ -67,7 +66,7 @@ class CreateUserPageState extends State<CreateUserPage> {
                         DataColumn(
                           label: Row(
                             children: [
-                              Text('SAP ID'),
+                              const Text('SAP ID'),
                               InkWell(
                                 onTap: () {
                                   setState(() {

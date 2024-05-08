@@ -16,7 +16,7 @@ class SharedService {
   static late String sapId;
   static late DateTime eventEndTime;
   static late String eventId;
-  static late bool networkConnected = false;
+  static bool networkConnected = false;
 
 
 

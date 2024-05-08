@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:ui/models/event/event_response_model.dart';
 import 'package:ui/services/api_service.dart';
+import 'package:timezone/timezone.dart' as tz;
+
 
 class EventsPage extends StatefulWidget {
   const EventsPage({super.key});
@@ -163,7 +165,9 @@ class _EventsPageState extends State<EventsPage> {
 
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime != null) {
-      return DateFormat.yMMMMd().add_jm().format(dateTime);
+      tz.Location istLocation = tz.getLocation('Asia/Kolkata');
+      tz.TZDateTime istDateTime = tz.TZDateTime.from(dateTime, istLocation);
+      return DateFormat.yMMMMd().add_jm().format(istDateTime);
     } else {
       return '';
     }
