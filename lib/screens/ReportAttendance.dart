@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:localstorage/localstorage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui/models/event/event_ended_model.dart';
@@ -20,13 +19,11 @@ class ReportAttendance extends StatefulWidget {
 class _ReportAttendanceState extends State<ReportAttendance> {
   late List<EventsEndedModel> events = [];
   late Map<int, bool> userSelectionMap;
-  late final LocalStorage storage;
 
   @override
   void initState() {
     super.initState();
     _fetchAllEventsEnded();
-    storage = LocalStorage('UI');
   }
 
   @override

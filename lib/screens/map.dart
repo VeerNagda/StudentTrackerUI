@@ -238,7 +238,7 @@ class _MapScreenState extends State<MapScreen> {
                   points: _polyPoints,
                   color: Colors.blueGrey.shade200.withOpacity(0.5),
                   isFilled: true,
-                  isDotted: true,
+                  //isDotted: true,
                 ),
               ],
             ),

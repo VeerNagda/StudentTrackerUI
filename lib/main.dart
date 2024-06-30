@@ -1,12 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ui/routes/routes.dart';
 import 'package:ui/services/background.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:ui/services/firebase_options.dart';
+import 'package:ui/services/push_location_service.dart';
+import 'package:ui/services/shared_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SharedService.init();
   if (kIsWeb) {
     // Some web specific code there
   } else if (defaultTargetPlatform == TargetPlatform.iOS ||
@@ -18,6 +26,11 @@ void main() async {
 
     // Handle permissions
   }
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await PushLocationService().initNotification();
+  FirebaseMessaging.onBackgroundMessage(initPushNotification);
 
   runApp(const MyApp());
 }
@@ -57,6 +70,10 @@ Future<void> handlePermissions() async {
   } else {
     handlePermissions();
   }
+}
+
+Future<void> initPushNotification(RemoteMessage message) async {
+  PushLocationService.handleMessage(message);
 }
 
 class MyApp extends StatelessWidget {

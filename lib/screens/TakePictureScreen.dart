@@ -82,7 +82,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     final tempFile = File('$tempPath/cropped_image.jpg');
 
     // Crop the image using the calculated rectangle and save it to the temporary file
-    final croppedImage = img.copyCrop(image!, left, top, width, height);
+    final croppedImage = img.copyCrop(image!, x: left, y: top, width: width, height: height);
     await tempFile
         .writeAsBytes(Uint8List.fromList(img.encodeJpg(croppedImage)));
 

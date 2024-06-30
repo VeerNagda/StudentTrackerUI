@@ -19,10 +19,12 @@ class SharedService {
   static bool networkConnected = false;
 
 
+  static init() async {
+    prefs = await SharedPreferences.getInstance();
+  }
 
   static Future<void> isLoggedIn() async {
     if (!isAuth) {
-      prefs = await SharedPreferences.getInstance();
       isAuth = prefs.containsKey("accessToken");
       if(isAuth){
         role = prefs.getInt('role')!;
@@ -49,13 +51,18 @@ class SharedService {
     sapId = sap ;
   }
   static void setUserDetails(UserResponseModel user) {
-    SharedService.prefs.setString("fName", user.fName);
-    SharedService.prefs.setString("lName", user.lName);
-    SharedService.prefs.setString("phone", user.phone);
-    SharedService.prefs.setString("email", user.email);
-    SharedService.prefs.setString("roll_no", user.rollNo);
+    prefs.setString("fName", user.fName);
+    prefs.setString("lName", user.lName);
+    prefs.setString("phone", user.phone);
+    prefs.setString("email", user.email);
+    prefs.setString("roll_no", user.rollNo);
   }
 
+  static void UpdateFCM(String id){
+    prefs.setString("fcm", id);
+    //TODO send id to server
+
+  }
 
   Future<bool> checkLocationService() async {
     bool serviceEnabled;
