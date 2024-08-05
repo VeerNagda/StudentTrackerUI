@@ -3,12 +3,12 @@ import 'package:ui/screens/AddGroup.dart';
 import 'package:ui/screens/AddSingleUser.dart';
 import 'package:ui/screens/AdminHomePage.dart';
 import 'package:ui/screens/HomePage.dart';
+import 'package:ui/screens/Selfie.dart';
 import 'package:ui/screens/TakePictureScreen.dart';
 import 'package:ui/screens/event_form.dart';
 import 'package:ui/screens/login_page.dart';
 import 'package:ui/screens/map.dart';
 import 'package:ui/services/shared_service.dart';
-
 
 // Import your screen widgets
 
@@ -33,43 +33,42 @@ class RouteConfig {
               builder: (context, state) => const HomePage(),
               routes: [
                 GoRoute(
-                  path: "verify-user",
-                  name: "verify-user",
-                  builder: (context,state) => const TakePictureScreen()
-                )
+                    path: "profile-pic",
+                    name: "profile-pic",
+                    builder: (context, state) => const Selfie()),
+                GoRoute(
+                    path: "verify-user",
+                    name: "verify-user",
+                    builder: (context, state) => const TakePictureScreen())
               ]),
           GoRoute(
-            path: '/admin',
-            name: "admin",
-            builder: (context, state) => const AdminHomePage(),
-
-            routes:[
-
-              GoRoute(
-                path: "add-venue",
-                name: "add-venue",
-                builder: (context,state) => const MapScreen(),
-              ),
-
-              GoRoute(
-                path: "single-user",
-                name:"single-user",
-                builder: (context,state) => AddSingleUserPage(sapId: state.uri.queryParameters["sapId"]),
-              ),
-              GoRoute(
-                path: "bulk-user",
-                name:"bulk-user",
-                builder: (context,state) => const AddGroup(),
-              ),
-              GoRoute(
-                path: "add-event",
-                name:"add-event",
-                builder: (context,state) => EventForm(eventId: state.uri.queryParameters["eventId"]),
-              )
-
-
-            ]
-          ),
+              path: '/admin',
+              name: "admin",
+              builder: (context, state) => const AdminHomePage(),
+              routes: [
+                GoRoute(
+                  path: "add-venue",
+                  name: "add-venue",
+                  builder: (context, state) => const MapScreen(),
+                ),
+                GoRoute(
+                  path: "single-user",
+                  name: "single-user",
+                  builder: (context, state) => AddSingleUserPage(
+                      sapId: state.uri.queryParameters["sapId"]),
+                ),
+                GoRoute(
+                  path: "bulk-user",
+                  name: "bulk-user",
+                  builder: (context, state) => const AddGroup(),
+                ),
+                GoRoute(
+                  path: "add-event",
+                  name: "add-event",
+                  builder: (context, state) =>
+                      EventForm(eventId: state.uri.queryParameters["eventId"]),
+                )
+              ]),
         ],
         //TODO add error page
         redirect: (context, state) async {

@@ -97,7 +97,7 @@ class APIService {
 
   static Future<String> doGet(
       {required String path,
-        String? param,
+      String? param,
       bool inValidateCache = false}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     Map<String, String> requestHeaders = {
@@ -107,10 +107,10 @@ class APIService {
     if (inValidateCache) {
       requestHeaders['Cache-Control'] = 'no-cache';
     }
-     Uri url;
-    if(param == null) {
+    Uri url;
+    if (param == null) {
       url = Uri.http(Constants.baseUri, "/api$path");
-    } else{
+    } else {
       url = Uri.http(Constants.baseUri, "/api$path/$param");
     }
 
@@ -137,23 +137,24 @@ class APIService {
   }
 
   static Future<int> doMultipartImagePost(
-      {required String path, required XFile image}) async {
+      {required String path, required XFile image, bool sendLoc = true}) async {
     Uri url = Uri.http(Constants.baseUri, "/api$path/${SharedService.sapId}");
     var request = http.MultipartRequest('POST', url);
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     request.headers['Authorization'] = 'Bearer ${loginData!.accessToken}';
-    await Geolocator.checkPermission();
-    Geolocator.requestPermission();
-    Position position = await LocationService.getCurrentPosition();
-    String coordinates = "${position.latitude} ${position.longitude}";
-
     var imageStream = http.ByteStream(image.openRead());
     var length = await image.length();
     var multipartFile = http.MultipartFile('image', imageStream, length,
         filename: image.path.split('/').last);
     request.files.add(multipartFile);
-    request.fields['location'] = coordinates;
-    request.fields['eventId'] = SharedService.eventId;
+    if (sendLoc) {
+      await Geolocator.checkPermission();
+      Geolocator.requestPermission();
+      Position position = await LocationService.getCurrentPosition();
+      String coordinates = "${position.latitude} ${position.longitude}";
+      request.fields['location'] = coordinates;
+      request.fields['eventId'] = SharedService.eventId;
+    }
 
     var response = await http.Response.fromStream(await request.send());
     if (response.statusCode == 200) {
@@ -204,7 +205,8 @@ class APIService {
     return response.statusCode;
   }
 
-  static Future<Uint8List?> doGetCSV({required String path, required String param}) async {
+  static Future<Uint8List?> doGetCSV(
+      {required String path, required String param}) async {
     LoginResponseModel? loginData = await SharedService.getLoginDetails();
     Map<String, String> requestHeaders = {
       'Authorization': 'Bearer ${loginData!.accessToken}',
@@ -222,5 +224,4 @@ class APIService {
       return null;
     }
   }
-
 }
