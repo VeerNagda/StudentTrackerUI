@@ -112,6 +112,9 @@ class _HomePageState extends State<HomePage> {
             _buildDetail('Roll Number', roll),
             _buildDetail('Phone', phone),
             _buildDetail('Email', email),
+            ElevatedButton(
+                onPressed: () => {context.pushNamed("profile-pic")},
+                child: const Text("Click Picture"))
           ],
         ),
       ),

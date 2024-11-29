@@ -1,4 +1,3 @@
-
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +28,7 @@ class _SelfieState extends State<Selfie> {
   void initCamera() async {
     final cameras = await availableCameras();
     final frontCamera = cameras.firstWhere(
-          (camera) => camera.lensDirection == CameraLensDirection.front,
+      (camera) => camera.lensDirection == CameraLensDirection.front,
       orElse: () => cameras.first,
     );
     camera = frontCamera;
@@ -40,6 +39,7 @@ class _SelfieState extends State<Selfie> {
     setState(() {});
     _initializeControllerFuture = _controller.initialize();
   }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -53,7 +53,8 @@ class _SelfieState extends State<Selfie> {
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done && camera != null) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              camera != null) {
             return CameraPreview(_controller);
           } else {
             return const Center(child: CircularProgressIndicator());
@@ -67,16 +68,10 @@ class _SelfieState extends State<Selfie> {
             final image = await _controller.takePicture();
 
             if (!mounted) return;
-            int response = await APIService.doMultipartImagePost(path: "/user/event/verify-user", image: image);
-            if (response == 200) {
-              FlutterBackgroundService().startService();
-            }
-
-            if (mounted) {
-              setState(() {
-                imagePath = image.path;
-              });
-              _navigateToProfileScreen(context, image.path);
+            int response = await APIService.doMultipartImagePost(
+                path: "/user/user-image", image: image, sendLoc: false);
+            if (response == 200 && context.mounted && context.canPop()) {
+              context.pop();
             }
           } catch (e) {
             if (kDebugMode) {
@@ -90,7 +85,7 @@ class _SelfieState extends State<Selfie> {
     );
   }
 
-  void _navigateToProfileScreen(BuildContext context, String imagePath) {
+/*  void _navigateToProfileScreen(BuildContext context, String imagePath) {
     context.pop(imagePath);
-  }
+  }*/
 }
