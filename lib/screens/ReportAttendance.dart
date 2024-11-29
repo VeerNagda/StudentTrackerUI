@@ -31,47 +31,58 @@ class _ReportAttendanceState extends State<ReportAttendance> {
 
   @override
   Widget build(BuildContext context) {
+    final _verticalScrollController = ScrollController();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Attendance Report'),
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-            columns: const <DataColumn>[
-              DataColumn(
-                label: Text(
-                  'Event ID',
-                  style: TextStyle(fontStyle: FontStyle.italic),
+        scrollDirection: Axis.vertical,
+        controller: _verticalScrollController,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+              columns: const <DataColumn>[
+                DataColumn(
+                  label: Text(
+                    'Event ID',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Event Name',
-                  style: TextStyle(fontStyle: FontStyle.italic),
+                DataColumn(
+                  label: Text(
+                    'Event Name',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Event Date',
-                  style: TextStyle(fontStyle: FontStyle.italic),
+                DataColumn(
+                  label: Text(
+                    'Event Date',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
                 ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Download',
-                  style: TextStyle(fontStyle: FontStyle.italic),
+                DataColumn(
+                  label: Text(
+                    'Download',
+                    style: TextStyle(fontStyle: FontStyle.italic),
+                  ),
                 ),
-              ),
-            ],
-            rows: events.map((event) {
-              return DataRow(cells: [
-                DataCell(Text(event.iD)),
-                DataCell(Text(event.name)),
-                DataCell(Text(event.endDate.toString())),
-                DataCell(download(event)),
-              ]);
-            }).toList()),
+                DataColumn(
+                    label: Text(
+                  'Details',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ))
+              ],
+              rows: events.map((event) {
+                return DataRow(cells: [
+                  DataCell(Text(event.iD)),
+                  DataCell(Text(event.name)),
+                  DataCell(Text(event.endDate.toString())),
+                  DataCell(download(event)),
+                  DataCell(moreInfo(event)),
+                ]);
+              }).toList()),
+        ),
       ),
     );
   }
@@ -98,6 +109,19 @@ class _ReportAttendanceState extends State<ReportAttendance> {
         _showConfirmationDialog(context, event);
       },
     );
+  }
+
+  Widget moreInfo(EventsEndedModel event) {
+    return IconButton(
+        onPressed: () {
+          _navigateToMoreInfoPage(context, event);
+        },
+        icon: const Icon(Icons.more_horiz));
+  }
+
+  void _navigateToMoreInfoPage(BuildContext context, EventsEndedModel event) {
+    context
+        .pushNamed('attendance-detail', queryParameters: {'eventID': event.iD});
   }
 
   void _showConfirmationDialog(BuildContext context, EventsEndedModel event) {
@@ -172,7 +196,8 @@ class _ReportAttendanceState extends State<ReportAttendance> {
               name: 'attendance.csv',
               bytes: value,
               filePath: path,
-              mimeType: MimeType.csv, ext: 'csv',
+              mimeType: MimeType.csv,
+              ext: 'csv',
             )
           }
       },
